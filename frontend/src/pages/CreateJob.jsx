@@ -21,8 +21,8 @@ function CreateJob() {
     gst: "",
     address1: "",
     address2: "",
-   city: "Bangalore",      
-  state: "Karnataka", 
+    city: "Bangalore",
+    state: "Karnataka",
     pincode: "",
     country: "India",
     productName: "",
@@ -41,7 +41,7 @@ function CreateJob() {
     setForm((prev) => ({
       ...prev,
       jobId: generateJobId(),
-      jobDate: new Date().toISOString().split("T")[0]
+      jobDate: new Date().toISOString().split("T")[0],
     }));
   }, []);
 
@@ -52,7 +52,10 @@ function CreateJob() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
+      await axios.post(
+        "https://ipremium-crm.onrender.com/api/customers",
+        form
+      );
       alert("Job Created Successfully ✅");
       navigate("/customers");
     } catch (error) {
@@ -66,20 +69,30 @@ function CreateJob() {
     <div className="premium-bg py-5">
       <div className="container">
         <div className="premium-card">
-
           <div className="premium-header">
             <h3>Create New Service Job</h3>
             <p>Enter complete service details below</p>
           </div>
 
           <div className="premium-body">
-
             {/* Job Info */}
             <SectionTitle title="Job Information" />
             <div className="row">
               <Input col="4" value={form.jobId} readOnly />
-              <Input col="4" type="date" name="jobDate" value={form.jobDate} onChange={handleChange} />
-              <Input col="4" type="date" name="deliveryDate" onChange={handleChange} />
+              <Input
+                col="4"
+                type="date"
+                name="jobDate"
+                value={form.jobDate}
+                onChange={handleChange}
+              />
+              <Input
+                col="4"
+                type="date"
+                name="deliveryDate"
+                value={form.deliveryDate}
+                onChange={handleChange}
+              />
             </div>
 
             <Divider />
@@ -94,39 +107,37 @@ function CreateJob() {
               <Input col="6" name="gst" value={form.gst} onChange={handleChange} placeholder="GST Number" />
               <Input col="6" name="address1" value={form.address1} onChange={handleChange} placeholder="Address Line 1" />
               <Input col="6" name="address2" value={form.address2} onChange={handleChange} placeholder="Address Line 2" />
-             <div className="col-md-4 mb-4">
-  <select
-    name="city"
-    value={form.city}
-    onChange={(e) => {
-      const selectedCity = e.target.value;
-      setForm({
-        ...form,
-        city: selectedCity,
-        state:
-          selectedCity === "Bangalore"
-            ? "Karnataka"
-           
-      });
-    }}
-    className="premium-input"
-  >
-    <option value="Bangalore">Bangalore</option>
-  
-  </select>
-</div>
 
-<div className="col-md-4 mb-4">
-  <select
-    name="state"
-    value={form.state}
-    onChange={handleChange}
-    className="premium-input"
-  >
-    <option value="Karnataka">Karnataka</option>
-    
-  </select>
-</div>
+              {/* City Dropdown */}
+              <div className="col-md-4 mb-4">
+                <select
+                  name="city"
+                  value={form.city}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      city: e.target.value,
+                      state: "Karnataka",
+                    })
+                  }
+                  className="premium-input"
+                >
+                  <option value="Bangalore">Bangalore</option>
+                </select>
+              </div>
+
+              {/* State Dropdown */}
+              <div className="col-md-4 mb-4">
+                <select
+                  name="state"
+                  value={form.state}
+                  onChange={handleChange}
+                  className="premium-input"
+                >
+                  <option value="Karnataka">Karnataka</option>
+                </select>
+              </div>
+
               <Input col="2" name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" />
               <Input col="2" name="country" value={form.country} onChange={handleChange} placeholder="Country" />
             </div>
@@ -168,12 +179,10 @@ function CreateJob() {
                 {loading ? "Creating..." : "Create Job"}
               </button>
             </div>
-
           </div>
         </div>
       </div>
 
-      {/* Premium Styles */}
       <style>{`
         .premium-bg {
           background: linear-gradient(135deg,#eef2f3,#dfe9f3);
@@ -181,7 +190,7 @@ function CreateJob() {
         }
 
         .premium-card {
-          background: rgba(255,255,255,0.85);
+          background: rgba(255,255,255,0.9);
           backdrop-filter: blur(20px);
           border-radius: 20px;
           box-shadow: 0 20px 60px rgba(0,0,0,0.08);
@@ -192,11 +201,6 @@ function CreateJob() {
           background: linear-gradient(135deg,#667eea,#764ba2);
           color: white;
           padding: 30px;
-        }
-
-        .premium-header h3 {
-          margin-bottom: 5px;
-          font-weight: 700;
         }
 
         .premium-body {
