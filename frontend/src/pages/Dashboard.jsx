@@ -13,11 +13,9 @@ function Dashboard() {
     activeJobs: 0
   });
 
-  // Fetch data from backend (dummy now)
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Example API calls
         const customers = await axios.get("https://ipremium-crm.onrender.com/api/customers");
         const quotations = await axios.get("https://ipremium-crm.onrender.com/api/quotations");
         const invoices = await axios.get("https://ipremium-crm.onrender.com/api/invoices");
@@ -36,10 +34,10 @@ function Dashboard() {
     fetchStats();
   }, []);
 
-  const menuButton = (label, path, color) => (
+  const menuButton = (label, path) => (
     <button
-      className={`btn w-100 mb-3 ${
-        location.pathname === path ? "btn-light text-dark fw-bold" : `btn-outline-${color}`
+      className={`sidebar-btn ${
+        location.pathname === path ? "active-btn" : ""
       }`}
       onClick={() => navigate(path)}
     >
@@ -51,85 +49,160 @@ function Dashboard() {
     <div className="d-flex">
 
       {/* Sidebar */}
-      <div className="bg-dark text-white p-4" style={{ width: "260px", minHeight: "100vh" }}>
-        <h4 className="fw-bold mb-4 text-center">iPremium Care</h4>
+      <div className="sidebar">
+        <h4 className="brand-title">iPremium Care</h4>
 
-        {menuButton("Create New Job", "/create-job", "light")}
-        {menuButton("Create Invoice", "/invoice", "success")}
-        {menuButton("View All Invoices", "/all-invoices", "warning")}
-        {menuButton("Create Quotation", "/quotation", "info")}
-        {menuButton("All Customers", "/customers", "secondary")}
+        {menuButton("Create New Job", "/create-job")}
+        {menuButton("Create Invoice", "/invoice")}
+        {menuButton("View All Invoices", "/all-invoices")}
+        {menuButton("Create Quotation", "/quotation")}
+        {menuButton("All Customers", "/customers")}
 
-
-        <hr className="border-light" />
-
-        <button className="btn btn-outline-danger w-100" onClick={() => navigate("/")}>
-          Logout
-        </button>
+        <div className="mt-auto">
+          <button className="logout-btn" onClick={() => navigate("/")}>
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow-1 bg-light">
+      <div className="main-content">
 
         {/* Top Navbar */}
-        <div className="d-flex justify-content-between align-items-center px-4 py-3 shadow-sm" style={{ background: "white" }}>
-          <h3 className="mb-0 fw-bold">iPremium Care Dashboard</h3>
-          <span className="text-muted">{new Date().toDateString()}</span>
+        <div className="topbar">
+          <h3>Dashboard Overview</h3>
+          <span>{new Date().toDateString()}</span>
         </div>
 
         {/* Stats Cards */}
         <div className="container mt-4">
-          <div className="row">
-            <div className="col-md-3 mb-4">
-              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}>
-                <div className="card-body">
-                  <h6>Total Customers</h6>
-                  <h2>{stats.totalCustomers}</h2>
-                </div>
-              </div>
-            </div>
+          <div className="row g-4">
 
-            <div className="col-md-3 mb-4">
-              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#f7971e,#ffd200)" }}>
-                <div className="card-body">
-                  <h6>Total Invoices</h6>
-                  <h2>{stats.totalInvoices}</h2>
-                </div>
-              </div>
-            </div>
+            <StatCard title="Total Customers" value={stats.totalCustomers} />
+            <StatCard title="Total Invoices" value={stats.totalInvoices} />
+            <StatCard title="Total Quotations" value={stats.totalQuotations} />
+            <StatCard title="Active Jobs" value={stats.activeJobs} />
 
-            <div className="col-md-3 mb-4">
-              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#11998e,#38ef7d)" }}>
-                <div className="card-body">
-                  <h6>Total Quotations</h6>
-                  <h2>{stats.totalQuotations}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-3 mb-4">
-              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#fc4a1a,#f7b733)" }}>
-                <div className="card-body">
-                  <h6>Active Jobs</h6>
-                  <h2>{stats.activeJobs}</h2>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Welcome Card */}
-          <div className="card shadow border-0 mt-4">
-            <div className="card-body">
-              <h5>Welcome Admin 👋</h5>
-              <p>
-                Manage all your CRM operations from this premium dashboard. 
-                Navigate through jobs, invoices, and quotations from the sidebar.
-              </p>
-            </div>
+          <div className="welcome-card mt-5">
+            <h5>Welcome Admin 👋</h5>
+            <p>
+              Manage all your CRM operations from this premium dashboard.
+              Navigate through jobs, invoices, and quotations using the sidebar.
+            </p>
           </div>
         </div>
       </div>
 
+      {/* Premium CSS */}
+      <style>{`
+        body {
+          font-family: 'Poppins', sans-serif;
+          background: #f4f6f9;
+        }
+
+        .sidebar {
+          width: 260px;
+          min-height: 100vh;
+          padding: 30px 20px;
+          display: flex;
+          flex-direction: column;
+          backdrop-filter: blur(20px);
+          background: linear-gradient(160deg,#1e1e2f,#2b2b45);
+          color: white;
+        }
+
+        .brand-title {
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 30px;
+          letter-spacing: 1px;
+        }
+
+        .sidebar-btn {
+          background: transparent;
+          border: none;
+          color: #ccc;
+          padding: 12px;
+          text-align: left;
+          margin-bottom: 10px;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+
+        .sidebar-btn:hover {
+          background: rgba(255,255,255,0.1);
+          color: white;
+          transform: translateX(5px);
+        }
+
+        .active-btn {
+          background: linear-gradient(135deg,#667eea,#764ba2);
+          color: white;
+          font-weight: 600;
+        }
+
+        .logout-btn {
+          background: linear-gradient(135deg,#ff4e50,#f9d423);
+          border: none;
+          padding: 12px;
+          border-radius: 8px;
+          color: white;
+          font-weight: 600;
+          width: 100%;
+        }
+
+        .main-content {
+          flex-grow: 1;
+          background: #f4f6f9;
+        }
+
+        .topbar {
+          background: white;
+          padding: 20px 30px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .card-custom {
+          background: white;
+          border-radius: 16px;
+          padding: 25px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+          transition: all 0.3s ease;
+        }
+
+        .card-custom:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-custom h2 {
+          font-weight: 700;
+          margin-top: 10px;
+        }
+
+        .welcome-card {
+          background: white;
+          padding: 30px;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function StatCard({ title, value }) {
+  return (
+    <div className="col-md-3">
+      <div className="card-custom">
+        <h6>{title}</h6>
+        <h2>{value}</h2>
+      </div>
     </div>
   );
 }
