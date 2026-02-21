@@ -28,9 +28,13 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   // FROM & BILL TO Section
   doc.fontSize(12).fillColor("blue").text("FROM:", { underline: true });
-  doc.fillColor("black").text("iPremium Care Shop");
-  doc.text("123 Business Street, City");
-  doc.text("GST: 12ABCDE3456F7Z8");
+  doc.fillColor("black").text("iPremium Care ");
+  doc.text("iPremium India - HSR Layout
+114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout Bengaluru, Karnataka
+India - 560102");
+  doc.text("GST: 29AAKFI8994H1ZH");
+  doc.text("Phone: 8884417766");
+  doc.text("Email: support@ipremiumindia.co.in");
   doc.moveDown();
 
   doc.fillColor("blue").text("BILL TO:", { underline: true });
