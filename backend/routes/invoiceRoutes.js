@@ -53,10 +53,8 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text("iPremium Care", 60)
      .moveDown(0.5)
      .text("iPremium India - HSR Layout")
-     .text("114-115, 80 ft road, 27th Main Rd")
-     .text("2nd Sector, HSR Layout")
+     .text("114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout")
      .text("Bengaluru, Karnataka - 560102")
-     .moveDown(0.5)
      .text("GST: 29AAKFI8994H1ZH")
      .text("Phone: 8884417766")
      .text("Email: support@ipremiumindia.co.in");
