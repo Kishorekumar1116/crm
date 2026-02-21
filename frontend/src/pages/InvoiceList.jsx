@@ -32,13 +32,13 @@ function InvoiceList() {
     try {
       const confirmSend = window.confirm("Send this invoice to the customer?");
       if (!confirmSend) return;
-
+       console.log("Sending invoiceId:", invoiceId)
       alert("Sending email... please wait.");
       await axios.post(`https://ipremium-crm.onrender.com/api/invoices/send-email/${invoiceId}`);
       alert("✅ Email sent successfully!");
     } catch (err) {
-      console.error("Email error:", err);
-      alert("❌ Failed to send email. Check customer email.");
+      console.error("Email error:", err.response?.data || err.message);
+    alert("❌ Failed to send email. See console for details.");
     }
   };
 
