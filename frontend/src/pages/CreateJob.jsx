@@ -21,8 +21,8 @@ function CreateJob() {
     gst: "",
     address1: "",
     address2: "",
-    city: "",
-    state: "",
+   city: "Bangalore",      
+  state: "Karnataka", 
     pincode: "",
     country: "India",
     productName: "",
@@ -94,8 +94,39 @@ function CreateJob() {
               <Input col="6" name="gst" value={form.gst} onChange={handleChange} placeholder="GST Number" />
               <Input col="6" name="address1" value={form.address1} onChange={handleChange} placeholder="Address Line 1" />
               <Input col="6" name="address2" value={form.address2} onChange={handleChange} placeholder="Address Line 2" />
-              <Input col="4" name="city" value={form.city} onChange={handleChange} placeholder="City" />
-              <Input col="4" name="state" value={form.state} onChange={handleChange} placeholder="State" />
+             <div className="col-md-4 mb-4">
+  <select
+    name="city"
+    value={form.city}
+    onChange={(e) => {
+      const selectedCity = e.target.value;
+      setForm({
+        ...form,
+        city: selectedCity,
+        state:
+          selectedCity === "Bangalore"
+            ? "Karnataka"
+           
+      });
+    }}
+    className="premium-input"
+  >
+    <option value="Bangalore">Bangalore</option>
+  
+  </select>
+</div>
+
+<div className="col-md-4 mb-4">
+  <select
+    name="state"
+    value={form.state}
+    onChange={handleChange}
+    className="premium-input"
+  >
+    <option value="Karnataka">Karnataka</option>
+    
+  </select>
+</div>
               <Input col="2" name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" />
               <Input col="2" name="country" value={form.country} onChange={handleChange} placeholder="Country" />
             </div>
