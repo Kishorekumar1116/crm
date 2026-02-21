@@ -25,7 +25,7 @@ function InvoiceList() {
   };
 
   const viewPdf = (invoiceId) => {
-    window.open(`http://localhost:5000/api/invoices/view-pdf/${invoiceId}`, "_blank");
+    window.open(`https://ipremium-crm.onrender.com/api/invoices/view-pdf/${invoiceId}`, "_blank");
   };
 
   const sendEmail = async (invoiceId) => {
@@ -34,7 +34,7 @@ function InvoiceList() {
       if (!confirmSend) return;
 
       alert("Sending email... please wait.");
-      await axios.post(`http://localhost:5000/api/invoices/send-email/${invoiceId}`);
+      await axios.post(`https://ipremium-crm.onrender.com/api/invoices/send-email/${invoiceId}`);
       alert("✅ Email sent successfully!");
     } catch (err) {
       console.error("Email error:", err);
@@ -146,19 +146,7 @@ function InvoiceList() {
                       >
                         📩 Send Email
                       </button>
-                      <button 
-                        className="btn btn-sm btn-outline-danger mx-1 shadow-sm"
-                        onMouseOver={e => {
-                          e.currentTarget.classList.add("bg-danger","text-white");
-                          e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseOut={e => {
-                          e.currentTarget.classList.remove("bg-danger","text-white");
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        Delete
-                      </button>
+                     
                     </td>
                   </tr>
                 ))
