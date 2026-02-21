@@ -14,7 +14,7 @@ function InvoiceList() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/invoices");
+      const res = await axios.get("https://ipremium-crm.onrender.com/api/invoices");
       const data = res.data.data || res.data;
       setInvoices(data);
       setLoading(false);
