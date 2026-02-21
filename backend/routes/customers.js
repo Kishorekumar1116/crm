@@ -3,44 +3,41 @@ const express = require("express");
 const router = express.Router();
 const Customer = require("../models/Customer"); // your Mongoose model
 const nodemailer = require("nodemailer");
+const Invoice = require("../models/Invoice");
 
-router.post("/", async (req, res) => {
+router.post("/send-email/:id", async (req, res) => {
   try {
-    // 1️⃣ Save job to DB
-    const customer = await Customer.create(req.body);
+    const invoice = await Invoice.findById(req.params.id)
+      .populate("customerId");
 
-    // 2️⃣ Send email
-    if (customer.email) {
-      const transporter = nodemailer.createTransport({
-        service: "Gmail", // or your email service
-        auth: {
-         user: "ipremiumindia@gmail.com", // Double check this email
-          pass: "mxwz ukcf jefk ucbv" // app password if Gmail
-        },
-      });
-
-      const mailOptions = {
-        from: `"iPremium Care" <${process.env.EMAIL_USER}>`,
-        to: customer.email,
-        subject: `Welcome to iPremium Care - ${customer.jobId}`,
-        html: `
-          <h2>Welcome to iPremium Care ✅</h2>
-          <p>Hi ${customer.name},</p>
-          <p>Your job <b>${customer.jobId}</b> has been created successfully.</p>
-          <p>We will keep you updated on the service status.</p>
-          <br/>
-          <p>Thank you for choosing iPremium Care!</p>
-        `,
-      };
-
-      await transporter.sendMail(mailOptions);
+    if (!invoice) {
+      return res.status(404).json({ msg: "Invoice not found" });
     }
 
-    res.status(201).json(customer);
+    if (!invoice.customerId?.email) {
+      return res.status(400).json({ msg: "Customer email missing" });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: invoice.customerId.email,
+      subject: "Invoice",
+      text: "Your invoice attached",
+    });
+
+    res.json({ msg: "Email sent" });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error creating job" });
+    console.error("SEND EMAIL ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 });
-
 module.exports = router;
