@@ -137,9 +137,12 @@ function Invoice() {
                   <div className="p-4 bg-white rounded-4 shadow-sm border-top border-primary border-4 h-100">
                     <h6 className="text-primary fw-bold mb-3">FROM:</h6>
                     <h5 className="fw-bold">iPremium Care</h5>
-                    <p className="small mb-1 text-muted">📍 Your Business Address, City</p>
-                    <p className="small mb-1 text-muted">🆔 GST: 12ABCDE3456F7Z8</p>
-                    <p className="small mb-0 text-muted">📞 +91 9876543210</p>
+                    <p className="small mb-1 text-muted">📍 iPremium India - HSR Layout
+114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout Bengaluru, Karnataka
+India - 560102</p>
+                    <p className="small mb-1 text-muted">🆔 GST: 29AAKFI8994H1ZH</p>
+                    <p className="small mb-0 text-muted">📞 +91 8884417766</p>
+                    <p className="small mb-0 text-muted">Email: support@ipremiumindia.co.in </p>
                   </div>
                 </div>
                 <div className="col-md-6">
