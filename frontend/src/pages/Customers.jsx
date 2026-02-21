@@ -10,7 +10,7 @@ function Customers() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/customers");
+        const res = await axios.get("https://ipremium-crm.onrender.com/api/customers");
         // ensure data is always an array
         setData(res.data.data || res.data || []);
       } catch (err) {
