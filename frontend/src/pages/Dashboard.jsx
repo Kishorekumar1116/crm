@@ -1,210 +1,237 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Dashboard() {
+function CreateJob() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const [stats, setStats] = useState({
-    totalCustomers: 0,
-    totalInvoices: 0,
-    totalQuotations: 0,
-    activeJobs: 0
+  const generateJobId = () => {
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return "JOB-2026-" + random;
+  };
+
+  const [form, setForm] = useState({
+    jobId: "",
+    jobDate: "",
+    deliveryDate: "",
+    name: "",
+    phone: "",
+    email: "",
+    company: "",
+    gst: "",
+    address1: "",
+    address2: "",
+   city: "",      
+  state: "", 
+    pincode: "",
+    country: "India",
+    productName: "",
+    brand: "",
+    model: "",
+    serialNo: "",
+    issue: "",
+    technician: "",
+    priority: "Medium",
+    status: "Pending",
   });
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const customers = await axios.get("https://ipremium-crm.onrender.com/api/customers");
-        const quotations = await axios.get("https://ipremium-crm.onrender.com/api/quotations");
-        const invoices = await axios.get("https://ipremium-crm.onrender.com/api/invoices");
-
-        setStats({
-          totalCustomers: customers.data.data?.length || customers.data.length || 0,
-          totalInvoices: invoices.data.data?.length || invoices.data.length || 0,
-          totalQuotations: quotations.data.data?.length || quotations.data.length || 0,
-          activeJobs: customers.data.data?.filter(j => j.status !== "Delivered").length || 0
-        });
-      } catch (err) {
-        console.log("Error fetching stats", err);
-      }
-    };
-
-    fetchStats();
+    setForm((prev) => ({
+      ...prev,
+      jobId: generateJobId(),
+      jobDate: new Date().toISOString().split("T")[0]
+    }));
   }, []);
 
-  const menuButton = (label, path) => (
-    <button
-      className={`sidebar-btn ${
-        location.pathname === path ? "active-btn" : ""
-      }`}
-      onClick={() => navigate(path)}
-    >
-      {label}
-    </button>
-  );
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
+      alert("Job Created Successfully ✅");
+      navigate("/customers");
+    } catch (error) {
+      alert("Error creating job ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="d-flex">
+    <div className="premium-bg py-5">
+      <div className="container">
+        <div className="premium-card">
 
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h4 className="brand-title">iPremium Care</h4>
+          <div className="premium-header">
+            <h3>Create New Service Job</h3>
+            <p>Enter complete service details below</p>
+          </div>
 
-        {menuButton("Create New Job", "/create-job")}
-        {menuButton("Create Invoice", "/invoice")}
-        {menuButton("View All Invoices", "/all-invoices")}
-        {menuButton("Create Quotation", "/quotation")}
-        {menuButton("All Customers", "/customers")}
+          <div className="premium-body">
 
-        <div className="mt-auto">
-          <button className="logout-btn" onClick={() => navigate("/")}>
-            Logout
-          </button>
+            {/* Job Info */}
+            <SectionTitle title="Job Information" />
+            <div className="row">
+              <Input col="4" value={form.jobId} readOnly />
+              <Input col="4" type="date" name="jobDate" value={form.jobDate} onChange={handleChange} />
+              <Input col="4" type="date" name="deliveryDate" onChange={handleChange} />
+            </div>
+
+            <Divider />
+
+            {/* Customer */}
+            <SectionTitle title="Customer Details" />
+            <div className="row">
+              <Input col="4" name="name" value={form.name} onChange={handleChange} placeholder="Customer Name" />
+              <Input col="4" name="phone" value={form.phone} onChange={handleChange} placeholder="Phone Number" />
+              <Input col="4" name="email" value={form.email} onChange={handleChange} placeholder="Email" />
+              <Input col="6" name="company" value={form.company} onChange={handleChange} placeholder="Company Name" />
+              <Input col="6" name="gst" value={form.gst} onChange={handleChange} placeholder="GST Number" />
+              <Input col="6" name="address1" value={form.address1} onChange={handleChange} placeholder="Address Line 1" />
+              <Input col="6" name="address2" value={form.address2} onChange={handleChange} placeholder="Address Line 2" />
+<Input col="4" name="city" value={form.city} onChange={handleChange} placeholder="City" />
+<Input col="4" name="state" value={form.state} onChange={handleChange} placeholder="State" />
+              <Input col="2" name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" />
+              <Input col="2" name="country" value={form.country} onChange={handleChange} placeholder="Country" />
+            </div>
+
+            <Divider />
+
+            {/* Product */}
+            <SectionTitle title="Product Details" />
+            <div className="row">
+              <Input col="4" name="productName" value={form.productName} onChange={handleChange} placeholder="Product Name" />
+              <Input col="4" name="brand" value={form.brand} onChange={handleChange} placeholder="Brand" />
+              <Input col="4" name="model" value={form.model} onChange={handleChange} placeholder="Model" />
+              <Input col="4" name="serialNo" value={form.serialNo} onChange={handleChange} placeholder="Serial Number" />
+            </div>
+
+            <Divider />
+
+            {/* Service */}
+            <SectionTitle title="Service Information" />
+            <div className="row">
+              <div className="col-md-6 mb-4">
+                <textarea
+                  name="issue"
+                  value={form.issue}
+                  onChange={handleChange}
+                  className="premium-input"
+                  placeholder="Describe Issue"
+                />
+              </div>
+              <Input col="6" name="technician" value={form.technician} onChange={handleChange} placeholder="Technician Name" />
+            </div>
+
+            <div className="text-end mt-4">
+              <button
+                className="premium-btn"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Job"}
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="main-content">
-
-        {/* Top Navbar */}
-        <div className="topbar">
-          <h3>Dashboard Overview</h3>
-          <span>{new Date().toDateString()}</span>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="container mt-4">
-          <div className="row g-4">
-
-            <StatCard title="Total Customers" value={stats.totalCustomers} />
-            <StatCard title="Total Invoices" value={stats.totalInvoices} />
-            <StatCard title="Total Quotations" value={stats.totalQuotations} />
-            <StatCard title="Active Jobs" value={stats.activeJobs} />
-
-          </div>
-
-          <div className="welcome-card mt-5">
-            <h5>Welcome Admin 👋</h5>
-            <p>
-              Manage all your CRM operations from this premium dashboard.
-              Navigate through jobs, invoices, and quotations using the sidebar.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Premium CSS */}
+      {/* Premium Styles */}
       <style>{`
-        body {
-          font-family: 'Poppins', sans-serif;
-          background: #f4f6f9;
-        }
-
-        .sidebar {
-          width: 260px;
+        .premium-bg {
+          background: linear-gradient(135deg,#eef2f3,#dfe9f3);
           min-height: 100vh;
-          padding: 30px 20px;
-          display: flex;
-          flex-direction: column;
+        }
+
+        .premium-card {
+          background: rgba(255,255,255,0.85);
           backdrop-filter: blur(20px);
-          background: linear-gradient(160deg,#1e1e2f,#2b2b45);
-          color: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+          overflow: hidden;
         }
 
-        .brand-title {
-          font-weight: 700;
-          text-align: center;
-          margin-bottom: 30px;
-          letter-spacing: 1px;
-        }
-
-        .sidebar-btn {
-          background: transparent;
-          border: none;
-          color: #ccc;
-          padding: 12px;
-          text-align: left;
-          margin-bottom: 10px;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-        }
-
-        .sidebar-btn:hover {
-          background: rgba(255,255,255,0.1);
-          color: white;
-          transform: translateX(5px);
-        }
-
-        .active-btn {
+        .premium-header {
           background: linear-gradient(135deg,#667eea,#764ba2);
           color: white;
-          font-weight: 600;
+          padding: 30px;
         }
 
-        .logout-btn {
-          background: linear-gradient(135deg,#ff4e50,#f9d423);
+        .premium-header h3 {
+          margin-bottom: 5px;
+          font-weight: 700;
+        }
+
+        .premium-body {
+          padding: 40px;
+        }
+
+        .premium-input {
+          width: 100%;
+          padding: 12px 15px;
+          border-radius: 10px;
+          border: 1px solid #e0e0e0;
+          transition: all 0.3s ease;
+          background: white;
+        }
+
+        .premium-input:focus {
+          border-color: #667eea;
+          box-shadow: 0 5px 20px rgba(102,126,234,0.2);
+          outline: none;
+        }
+
+        .premium-btn {
+          background: linear-gradient(135deg,#11998e,#38ef7d);
           border: none;
-          padding: 12px;
-          border-radius: 8px;
+          padding: 12px 30px;
+          border-radius: 10px;
           color: white;
           font-weight: 600;
-          width: 100%;
+          transition: 0.3s;
         }
 
-        .main-content {
-          flex-grow: 1;
-          background: #f4f6f9;
+        .premium-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-        .topbar {
-          background: white;
-          padding: 20px 30px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        .section-title {
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #444;
         }
 
-        .card-custom {
-          background: white;
-          border-radius: 16px;
-          padding: 25px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-          transition: all 0.3s ease;
-        }
-
-        .card-custom:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-        }
-
-        .card-custom h2 {
-          font-weight: 700;
-          margin-top: 10px;
-        }
-
-        .welcome-card {
-          background: white;
-          padding: 30px;
-          border-radius: 16px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        .divider {
+          margin: 40px 0;
+          height: 1px;
+          background: #eee;
         }
       `}</style>
     </div>
   );
 }
 
-function StatCard({ title, value }) {
+function Input({ col, ...props }) {
   return (
-    <div className="col-md-3">
-      <div className="card-custom">
-        <h6>{title}</h6>
-        <h2>{value}</h2>
-      </div>
+    <div className={`col-md-${col} mb-4`}>
+      <input {...props} className="premium-input" />
     </div>
   );
 }
 
-export default Dashboard;
+function SectionTitle({ title }) {
+  return <h5 className="section-title">{title}</h5>;
+}
+
+function Divider() {
+  return <div className="divider"></div>;
+}
+
+export default CreateJob;
