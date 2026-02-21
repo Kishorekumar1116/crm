@@ -3,180 +3,235 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function CreateJob() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const generateJobId = () => {
-        const random = Math.floor(1000 + Math.random() * 9000);
-        return "JOB-2026-" + random;
-    };
+  const generateJobId = () => {
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return "JOB-2026-" + random;
+  };
 
   const [form, setForm] = useState({
-  jobId: "",
-  jobDate: "",
-  deliveryDate: "",
-  name: "",
-  phone: "",
-  email: "",
-  company: "",
-  gst: "",
-  address1: "",
-  address2: "",
-  city: "",
-  state: "",
-  pincode: "",
-  country: "India",
-  productName: "",
-  brand: "",
-  model: "",
-  serialNo: "",
-  issue: "",
-  technician: "",
-  priority: "Medium",
-  status: "Pending",
-});
+    jobId: "",
+    jobDate: "",
+    deliveryDate: "",
+    name: "",
+    phone: "",
+    email: "",
+    company: "",
+    gst: "",
+    address1: "",
+    address2: "",
+    city: "",
+    state: "",
+    pincode: "",
+    country: "India",
+    productName: "",
+    brand: "",
+    model: "",
+    serialNo: "",
+    issue: "",
+    technician: "",
+    priority: "Medium",
+    status: "Pending",
+  });
 
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setForm((prev) => ({
-            ...prev,
-            jobId: generateJobId(),
-            jobDate: new Date().toISOString().split("T")[0]
-        }));
-    }, []);
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      jobId: generateJobId(),
+      jobDate: new Date().toISOString().split("T")[0]
+    }));
+  }, []);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    const handleSubmit = async () => {
-        try {
-            setLoading(true);
-            await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
-            alert("Job Created Successfully ✅");
-            navigate("/customers");
-        } catch (error) {
-            alert("Error creating job ❌");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
+      alert("Job Created Successfully ✅");
+      navigate("/customers");
+    } catch (error) {
+      alert("Error creating job ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="container mt-5">
-            <div className="card shadow-lg border-0">
-                <div
-                    className="card-header text-white"
-                    style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}
-                >
-                    <h4 className="mb-0">Create New Service Job</h4>
-                </div>
-                <div className="card-body">
+  return (
+    <div className="premium-bg py-5">
+      <div className="container">
+        <div className="premium-card">
 
-                    {/* Job Info */}
-                    <h5 className="text-primary">Job Information</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input className="form-control" value={form.jobId} readOnly />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input type="date" name="jobDate" value={form.jobDate} onChange={handleChange} className="form-control" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input type="date" name="deliveryDate" onChange={handleChange} className="form-control" />
-                        </div>
-                    </div>
+          <div className="premium-header">
+            <h3>Create New Service Job</h3>
+            <p>Enter complete service details below</p>
+          </div>
 
-                    <hr />
+          <div className="premium-body">
 
-                    {/* Customer Info */}
-                    <h5 className="text-success">Customer Details</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Customer Name" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="phone" value={form.phone} onChange={handleChange} className="form-control" placeholder="Phone Number" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="email" value={form.email} onChange={handleChange} className="form-control" placeholder="Email" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="company" value={form.company} onChange={handleChange} className="form-control" placeholder="Company Name" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="gst" value={form.gst} onChange={handleChange} className="form-control" placeholder="GST Number" />
-                        </div>
-
-                        {/* Address Fields */}
-                        <div className="col-md-6 mb-3">
-                            <input name="address1" value={form.address1} onChange={handleChange} className="form-control" placeholder="Address Line 1" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="address2" value={form.address2} onChange={handleChange} className="form-control" placeholder="Address Line 2" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="City" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="state" value={form.state} onChange={handleChange} className="form-control" placeholder="State" />
-                        </div>
-                        <div className="col-md-2 mb-3">
-                            <input name="pincode" value={form.pincode} onChange={handleChange} className="form-control" placeholder="Pincode" />
-                        </div>
-                        <div className="col-md-2 mb-3">
-                            <input name="country" value={form.country} onChange={handleChange} className="form-control" placeholder="Country" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    {/* Product Info */}
-                    <h5 className="text-warning">Product Details</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Product Name" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="brand" value={form.brand} onChange={handleChange} className="form-control" placeholder="Brand" />
-                        </div>
-                        <div className="col-md-3 mb-3">
-                            <input name="model" value={form.model} onChange={handleChange} className="form-control" placeholder="Model" />
-                        </div>
-                        <div className="col-md-3 mb-3">
-                            <input name="serialNo" value={form.serialNo} onChange={handleChange} className="form-control" placeholder="Serial Number" />
-                        </div>
-                       
-                    </div>
-
-                    <hr />
-
-                    {/* Service & Payment */}
-                    <h5 className="text-danger">Service & Payment</h5>
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <textarea name="issue" value={form.issue} onChange={handleChange} className="form-control" placeholder="Describe Issue" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="technician" value={form.technician} onChange={handleChange} className="form-control" placeholder="Technician Name" />
-                        </div>
-                    </div>
-
-                    <div className="text-end mt-4">
-                        <button
-                            className="btn btn-lg text-white"
-                            style={{ background: "linear-gradient(135deg,#11998e,#38ef7d)", border: "none" }}
-                            onClick={handleSubmit}
-                            disabled={loading}
-                        >
-                            {loading ? "Creating..." : "Create Job"}
-                        </button>
-                    </div>
-
-                </div>
+            {/* Job Info */}
+            <SectionTitle title="Job Information" />
+            <div className="row">
+              <Input col="4" value={form.jobId} readOnly />
+              <Input col="4" type="date" name="jobDate" value={form.jobDate} onChange={handleChange} />
+              <Input col="4" type="date" name="deliveryDate" onChange={handleChange} />
             </div>
+
+            <Divider />
+
+            {/* Customer */}
+            <SectionTitle title="Customer Details" />
+            <div className="row">
+              <Input col="4" name="name" value={form.name} onChange={handleChange} placeholder="Customer Name" />
+              <Input col="4" name="phone" value={form.phone} onChange={handleChange} placeholder="Phone Number" />
+              <Input col="4" name="email" value={form.email} onChange={handleChange} placeholder="Email" />
+              <Input col="6" name="company" value={form.company} onChange={handleChange} placeholder="Company Name" />
+              <Input col="6" name="gst" value={form.gst} onChange={handleChange} placeholder="GST Number" />
+              <Input col="6" name="address1" value={form.address1} onChange={handleChange} placeholder="Address Line 1" />
+              <Input col="6" name="address2" value={form.address2} onChange={handleChange} placeholder="Address Line 2" />
+              <Input col="4" name="city" value={form.city} onChange={handleChange} placeholder="City" />
+              <Input col="4" name="state" value={form.state} onChange={handleChange} placeholder="State" />
+              <Input col="2" name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" />
+              <Input col="2" name="country" value={form.country} onChange={handleChange} placeholder="Country" />
+            </div>
+
+            <Divider />
+
+            {/* Product */}
+            <SectionTitle title="Product Details" />
+            <div className="row">
+              <Input col="4" name="productName" value={form.productName} onChange={handleChange} placeholder="Product Name" />
+              <Input col="4" name="brand" value={form.brand} onChange={handleChange} placeholder="Brand" />
+              <Input col="4" name="model" value={form.model} onChange={handleChange} placeholder="Model" />
+              <Input col="4" name="serialNo" value={form.serialNo} onChange={handleChange} placeholder="Serial Number" />
+            </div>
+
+            <Divider />
+
+            {/* Service */}
+            <SectionTitle title="Service Information" />
+            <div className="row">
+              <div className="col-md-6 mb-4">
+                <textarea
+                  name="issue"
+                  value={form.issue}
+                  onChange={handleChange}
+                  className="premium-input"
+                  placeholder="Describe Issue"
+                />
+              </div>
+              <Input col="6" name="technician" value={form.technician} onChange={handleChange} placeholder="Technician Name" />
+            </div>
+
+            <div className="text-end mt-4">
+              <button
+                className="premium-btn"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Job"}
+              </button>
+            </div>
+
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Premium Styles */}
+      <style>{`
+        .premium-bg {
+          background: linear-gradient(135deg,#eef2f3,#dfe9f3);
+          min-height: 100vh;
+        }
+
+        .premium-card {
+          background: rgba(255,255,255,0.85);
+          backdrop-filter: blur(20px);
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+          overflow: hidden;
+        }
+
+        .premium-header {
+          background: linear-gradient(135deg,#667eea,#764ba2);
+          color: white;
+          padding: 30px;
+        }
+
+        .premium-header h3 {
+          margin-bottom: 5px;
+          font-weight: 700;
+        }
+
+        .premium-body {
+          padding: 40px;
+        }
+
+        .premium-input {
+          width: 100%;
+          padding: 12px 15px;
+          border-radius: 10px;
+          border: 1px solid #e0e0e0;
+          transition: all 0.3s ease;
+          background: white;
+        }
+
+        .premium-input:focus {
+          border-color: #667eea;
+          box-shadow: 0 5px 20px rgba(102,126,234,0.2);
+          outline: none;
+        }
+
+        .premium-btn {
+          background: linear-gradient(135deg,#11998e,#38ef7d);
+          border: none;
+          padding: 12px 30px;
+          border-radius: 10px;
+          color: white;
+          font-weight: 600;
+          transition: 0.3s;
+        }
+
+        .premium-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .section-title {
+          font-weight: 600;
+          margin-bottom: 20px;
+          color: #444;
+        }
+
+        .divider {
+          margin: 40px 0;
+          height: 1px;
+          background: #eee;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function Input({ col, ...props }) {
+  return (
+    <div className={`col-md-${col} mb-4`}>
+      <input {...props} className="premium-input" />
+    </div>
+  );
+}
+
+function SectionTitle({ title }) {
+  return <h5 className="section-title">{title}</h5>;
+}
+
+function Divider() {
+  return <div className="divider"></div>;
 }
 
 export default CreateJob;
