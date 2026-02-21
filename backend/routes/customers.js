@@ -9,7 +9,8 @@ router.post("/send-email/:id", async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate("customerId");
-
+     console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
     if (!invoice) {
       return res.status(404).json({ msg: "Invoice not found" });
     }
