@@ -20,7 +20,7 @@ function Invoice() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/customers");
+        const res = await axios.get("https://ipremium-crm.onrender.com/api/customers");
         const allCustomers = res.data.data || res.data;
         setCustomers(allCustomers);
 
