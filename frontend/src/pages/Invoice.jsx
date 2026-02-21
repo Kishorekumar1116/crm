@@ -53,7 +53,7 @@ function Invoice() {
 
     try {
       // 1. Send data to backend
-      const res = await axios.post("http://localhost:5000/api/invoices", {
+      const res = await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
         customerId: selected,
         amount: Number(amount), // Ensure it's a number
         notes,
