@@ -52,7 +52,7 @@ function CreateJob() {
     const handleSubmit = async () => {
         try {
             setLoading(true);
-            await axios.post("http://localhost:5000/api/customers", form);
+            await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
             alert("Job Created Successfully ✅");
             navigate("/customers");
         } catch (error) {
