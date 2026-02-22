@@ -18,9 +18,9 @@ function Dashboard() {
     const fetchStats = async () => {
       try {
         // Example API calls
-        const customers = await axios.get("http://localhost:5000/api/customers");
-        const quotations = await axios.get("http://localhost:5000/api/quotations");
-        const invoices = await axios.get("http://localhost:5000/api/invoices");
+        const customers = await axios.get("https://ipremium-crm.onrender.com/api/customers");
+        const quotations = await axios.get("https://ipremium-crm.onrender.com/api/quotations");
+        const invoices = await axios.get("https://ipremium-crm.onrender.com/api/invoices");
 
         setStats({
           totalCustomers: customers.data.data?.length || customers.data.length || 0,
