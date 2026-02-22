@@ -16,17 +16,22 @@ const sanitizeFields = (data) => {
 
 // Create Job
 router.post("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const count = await Customer.countDocuments();
-    const jobId = `JOB-2026-${count + 1}`;
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const jobId = "JOB-2026-" + random;
 
-    const payload = sanitizeFields({ ...req.body, jobId });
+    const newCustomer = new Customer({
+      ...req.body,
+      jobId
+    });
 
-    const newCustomer = await Customer.create(payload);
-    res.status(201).json(newCustomer);
+    const saved = await newCustomer.save();
+    res.json(saved);
+
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Error creating job", error: err.message });
+    console.log("FULL ERROR:", err);
+    res.status(500).json({ message: err.message });
   }
 });
 
