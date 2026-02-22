@@ -29,6 +29,6 @@ const customerSchema = new mongoose.Schema({
   technician: { type: String,  required: true },
   priority: { type: String, enum: ["Low","Medium","High","Urgent"], default: "Medium" },
   status: { type: String, enum: ["Pending","In Progress","Completed","Delivered"], default: "Pending" }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("Customer", customerSchema);
