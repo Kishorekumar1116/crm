@@ -1,182 +1,137 @@
-import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-function CreateJob() {
-    const navigate = useNavigate();
+function Dashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const generateJobId = () => {
-        const random = Math.floor(1000 + Math.random() * 9000);
-        return "JOB-2026-" + random;
+  const [stats, setStats] = useState({
+    totalCustomers: 0,
+    totalInvoices: 0,
+    totalQuotations: 0,
+    activeJobs: 0
+  });
+
+  // Fetch data from backend (dummy now)
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Example API calls
+        const customers = await axios.get("http://localhost:5000/api/customers");
+        const quotations = await axios.get("http://localhost:5000/api/quotations");
+        const invoices = await axios.get("http://localhost:5000/api/invoices");
+
+        setStats({
+          totalCustomers: customers.data.data?.length || customers.data.length || 0,
+          totalInvoices: invoices.data.data?.length || invoices.data.length || 0,
+          totalQuotations: quotations.data.data?.length || quotations.data.length || 0,
+          activeJobs: customers.data.data?.filter(j => j.status !== "Delivered").length || 0
+        });
+      } catch (err) {
+        console.log("Error fetching stats", err);
+      }
     };
 
-  const [form, setForm] = useState({
-  jobId: "",
-  jobDate: "",
-  deliveryDate: "",
-  name: "",
-  phone: "",
-  email: "",
-  company: "",
-  gst: "",
-  address1: "",
-  address2: "",
-  city: "",
-  state: "",
-  pincode: "",
-  country: "India",
-  productName: "",
-  brand: "",
-  model: "",
-  serialNo: "",
-  issue: "",
-  technician: "",
-  priority: "Medium",
-  status: "Pending",
-});
+    fetchStats();
+  }, []);
 
-    const [loading, setLoading] = useState(false);
+  const menuButton = (label, path, color) => (
+    <button
+      className={`btn w-100 mb-3 ${
+        location.pathname === path ? "btn-light text-dark fw-bold" : `btn-outline-${color}`
+      }`}
+      onClick={() => navigate(path)}
+    >
+      {label}
+    </button>
+  );
 
-    useEffect(() => {
-        setForm((prev) => ({
-            ...prev,
-            jobId: generateJobId(),
-            jobDate: new Date().toISOString().split("T")[0]
-        }));
-    }, []);
+  return (
+    <div className="d-flex">
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+      {/* Sidebar */}
+      <div className="bg-dark text-white p-4" style={{ width: "260px", minHeight: "100vh" }}>
+        <h4 className="fw-bold mb-4 text-center">iPremium Care</h4>
 
-    const handleSubmit = async () => {
-        try {
-            setLoading(true);
-            await axios.post("https://ipremium-crm.onrender.com/api/customers", form);
-            alert("Job Created Successfully ✅");
-            navigate("/customers");
-        } catch (error) {
-            alert("Error creating job ❌");
-        } finally {
-            setLoading(false);
-        }
-    };
+        {menuButton("Create New Job", "/create-job", "light")}
+        {menuButton("Create Invoice", "/invoice", "success")}
+        {menuButton("View All Invoices", "/all-invoices", "warning")}
+        {menuButton("Create Quotation", "/quotation", "info")}
+        {menuButton("All Customers", "/customers", "secondary")}
 
-    return (
-        <div className="container mt-5">
-            <div className="card shadow-lg border-0">
-                <div
-                    className="card-header text-white"
-                    style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}
-                >
-                    <h4 className="mb-0">Create New Service Job</h4>
-                </div>
-                <div className="card-body">
 
-                    {/* Job Info */}
-                    <h5 className="text-primary">Job Information</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input className="form-control" value={form.jobId} readOnly />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input type="date" name="jobDate" value={form.jobDate} onChange={handleChange} className="form-control" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input type="date" name="deliveryDate" onChange={handleChange} className="form-control" />
-                        </div>
-                    </div>
+        <hr className="border-light" />
 
-                    <hr />
+        <button className="btn btn-outline-danger w-100" onClick={() => navigate("/")}>
+          Logout
+        </button>
+      </div>
 
-                    {/* Customer Info */}
-                    <h5 className="text-success">Customer Details</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Customer Name" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="phone" value={form.phone} onChange={handleChange} className="form-control" placeholder="Phone Number" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="email" value={form.email} onChange={handleChange} className="form-control" placeholder="Email" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="company" value={form.company} onChange={handleChange} className="form-control" placeholder="Company Name" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="gst" value={form.gst} onChange={handleChange} className="form-control" placeholder="GST Number" />
-                        </div>
+      {/* Main Content */}
+      <div className="flex-grow-1 bg-light">
 
-                        {/* Address Fields */}
-                        <div className="col-md-6 mb-3">
-                            <input name="address1" value={form.address1} onChange={handleChange} className="form-control" placeholder="Address Line 1" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="address2" value={form.address2} onChange={handleChange} className="form-control" placeholder="Address Line 2" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="City" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="state" value={form.state} onChange={handleChange} className="form-control" placeholder="State" />
-                        </div>
-                        <div className="col-md-2 mb-3">
-                            <input name="pincode" value={form.pincode} onChange={handleChange} className="form-control" placeholder="Pincode" />
-                        </div>
-                        <div className="col-md-2 mb-3">
-                            <input name="country" value={form.country} onChange={handleChange} className="form-control" placeholder="Country" />
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    {/* Product Info */}
-                    <h5 className="text-warning">Product Details</h5>
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Product Name" />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <input name="brand" value={form.brand} onChange={handleChange} className="form-control" placeholder="Brand" />
-                        </div>
-                        <div className="col-md-3 mb-3">
-                            <input name="model" value={form.model} onChange={handleChange} className="form-control" placeholder="Model" />
-                        </div>
-                        <div className="col-md-3 mb-3">
-                            <input name="serialNo" value={form.serialNo} onChange={handleChange} className="form-control" placeholder="Serial Number" />
-                        </div>
-                       
-                    </div>
-
-                    <hr />
-
-                    {/* Service & Payment */}
-                    <h5 className="text-danger">Service & Payment</h5>
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <textarea name="issue" value={form.issue} onChange={handleChange} className="form-control" placeholder="Describe Issue" />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <input name="technician" value={form.technician} onChange={handleChange} className="form-control" placeholder="Technician Name" />
-                        </div>
-                    </div>
-
-                    <div className="text-end mt-4">
-                        <button
-                            className="btn btn-lg text-white"
-                            style={{ background: "linear-gradient(135deg,#11998e,#38ef7d)", border: "none" }}
-                            onClick={handleSubmit}
-                            disabled={loading}
-                        >
-                            {loading ? "Creating..." : "Create Job"}
-                        </button>
-                    </div>
-
-                </div>
-            </div>
+        {/* Top Navbar */}
+        <div className="d-flex justify-content-between align-items-center px-4 py-3 shadow-sm" style={{ background: "white" }}>
+          <h3 className="mb-0 fw-bold">iPremium Care Dashboard</h3>
+          <span className="text-muted">{new Date().toDateString()}</span>
         </div>
-    );
+
+        {/* Stats Cards */}
+        <div className="container mt-4">
+          <div className="row">
+            <div className="col-md-3 mb-4">
+              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#667eea,#764ba2)" }}>
+                <div className="card-body">
+                  <h6>Total Customers</h6>
+                  <h2>{stats.totalCustomers}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-3 mb-4">
+              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#f7971e,#ffd200)" }}>
+                <div className="card-body">
+                  <h6>Total Invoices</h6>
+                  <h2>{stats.totalInvoices}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-3 mb-4">
+              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#11998e,#38ef7d)" }}>
+                <div className="card-body">
+                  <h6>Total Quotations</h6>
+                  <h2>{stats.totalQuotations}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-3 mb-4">
+              <div className="card shadow-lg border-0 text-white" style={{ background: "linear-gradient(135deg,#fc4a1a,#f7b733)" }}>
+                <div className="card-body">
+                  <h6>Active Jobs</h6>
+                  <h2>{stats.activeJobs}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Welcome Card */}
+          <div className="card shadow border-0 mt-4">
+            <div className="card-body">
+              <h5>Welcome Admin 👋</h5>
+              <p>
+                Manage all your CRM operations from this premium dashboard. 
+                Navigate through jobs, invoices, and quotations from the sidebar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
 }
 
-export default CreateJob; 
+export default Dashboard;
