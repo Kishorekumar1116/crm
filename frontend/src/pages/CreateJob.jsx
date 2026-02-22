@@ -5,10 +5,6 @@ import { useNavigate } from "react-router-dom";
 function CreateJob() {
     const navigate = useNavigate();
 
-    const generateJobId = () => {
-        const random = Math.floor(1000 + Math.random() * 9000);
-        return "JOB-2026-" + random;
-    };
 
   const [form, setForm] = useState({
   jobId: "",
@@ -40,7 +36,7 @@ function CreateJob() {
     useEffect(() => {
         setForm((prev) => ({
             ...prev,
-            jobId: generateJobId(),
+         
             jobDate: new Date().toISOString().split("T")[0]
         }));
     }, []);
