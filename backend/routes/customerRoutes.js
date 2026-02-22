@@ -15,11 +15,10 @@ const sanitizeFields = (data) => {
 };
 
 // Create Job
-router.post("/", async (req, res) => {
+// Create Job
 router.post("/", async (req, res) => {
   try {
-    const random = Math.floor(1000 + Math.random() * 9000);
-    const jobId = "JOB-2026-" + random;
+    const jobId = "JOB-" + Date.now(); // safer unique ID
 
     const newCustomer = new Customer({
       ...req.body,
