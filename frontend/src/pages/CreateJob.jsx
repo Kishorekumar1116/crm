@@ -56,6 +56,7 @@ function CreateJob() {
             alert("Job Created Successfully ✅");
             navigate("/customers");
         } catch (error) {
+            console.log(error)
             alert("Error creating job ❌");
         } finally {
             setLoading(false);
