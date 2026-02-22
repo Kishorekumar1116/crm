@@ -60,6 +60,7 @@ function CreateJob() {
             alert("Error creating job ❌");
         } finally {
             setLoading(false);
+            console.log(form)
         }
     };
 
