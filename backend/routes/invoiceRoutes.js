@@ -200,35 +200,60 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // TERMS & CONDITIONS (SAME PAGE)
   // =========================
 
-  // If page almost full, add new page safely
-  if (doc.y > 700) {
-    doc.addPage();
-  }
+ // =========================
+// TERMS & CONDITIONS (PROPER CENTER BLOCK)
+// =========================
 
-  doc.moveDown(1);
+if (doc.y > 680) {
+  doc.addPage();
+}
 
-  doc.fontSize(11).font("Helvetica-Bold").text("Terms & Conditions");
+doc.moveDown(1.5);
 
-  doc.moveDown(0.5);
-  doc.fontSize(9).font("Helvetica");
+// Centered Title
+doc.fontSize(12)
+   .font("Helvetica-Bold")
+   .text("TERMS & CONDITIONS", {
+     align: "center"
+   });
 
-  const terms = [
-    "1. Full payment is required upon delivery.",
-    "2. All sales are final. No refund after service completion.",
-    "3. Diagnostic charges apply if repair is not approved.",
-    "4. Warranty does not cover physical or liquid damage.",
-    "5. Warranty applies only to replaced parts.",
-    "6. Devices must be collected within 90 days.",
-    "7. Jurisdiction: Bengaluru, Karnataka."
-  ];
+doc.moveDown(0.8);
 
-  terms.forEach(line => {
-    doc.text(line, { width: 500 });
-    doc.moveDown(0.4);
-  });
+// Define centered content width
+const termsWidth = 420;
+const centerX = (doc.page.width - termsWidth) / 2;
 
-  doc.moveDown(2);
+doc.fontSize(9).font("Helvetica");
 
+// Draw subtle divider line above
+doc.moveTo(centerX, doc.y - 5)
+   .lineTo(centerX + termsWidth, doc.y - 5)
+   .stroke();
+
+// Terms Content
+const termsText = `
+1. Full payment is required upon delivery of the repaired device.
+
+2. All sales are final. No refunds will be issued after service completion.
+
+3. Diagnostic charges are applicable if the repair quotation is not approved.
+
+4. Warranty does not cover physical damage, water damage, or tampering.
+
+5. Warranty is applicable only to replaced parts and not the entire device.
+
+6. Devices must be collected within 90 days from completion date.
+
+7. Any disputes are subject to Bengaluru, Karnataka jurisdiction only.
+`;
+
+doc.text(termsText.trim(), centerX, doc.y, {
+  width: termsWidth,
+  align: "left",
+  lineGap: 4
+});
+
+doc.moveDown(2);
   // =========================
   // FOOTER
   // =========================
