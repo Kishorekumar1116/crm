@@ -21,118 +21,144 @@ const transporter = nodemailer.createTransport({
 // PDF GENERATOR FUNCTION
 // ==============================
 const generatePDFContent = (doc, invoice, flattened) => {
+  doc.font("Helvetica");
 
-  // HEADER
-  doc.fontSize(22).fillColor("#2c3e50")
-     .text("iPremium Care", { align: "center" });
+  // =========================
+  // TITLE
+  // =========================
+  doc.fontSize(26).text("Invoice", { align: "center" });
+  doc.moveDown(1.5);
 
-  doc.fontSize(10).fillColor("black")
-     .text("Your Trusted Service Partner", { align: "center" });
+  // =========================
+  // FROM SECTION
+  // =========================
+  doc.fontSize(11).font("Helvetica-Bold").text("From");
+  doc.font("Helvetica");
+
+  doc.text("iPremium India - HSR Layout");
+  doc.text("114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout");
+  doc.text("Bengaluru, Karnataka");
+  doc.text("India - 560102");
+  doc.text("Phone: 8884417766");
+  doc.text("Email: support@ipremiumindia.co.in");
+  doc.text("TAX ID : 29AAKFI8994H1ZH");
 
   doc.moveDown();
+
+  // =========================
+  // TO SECTION
+  // =========================
+  doc.font("Helvetica-Bold").text("To");
+  doc.font("Helvetica");
+
+  doc.text(flattened.name || "");
+  doc.text("Bengaluru, Karnataka");
+  doc.text("India -");
+  doc.text(`Phone: ${flattened.phone || ""}`);
+  doc.text(`Email: ${flattened.email || ""}`);
+
+  doc.moveDown(1.5);
+
+  // =========================
+  // INVOICE INFO (RIGHT SIDE)
+  // =========================
+  const rightX = 350;
+
+  doc.font("Helvetica-Bold");
+  doc.text(`Invoice # IPI ${invoice.invoiceNumber || invoice._id}`, rightX, 120);
+  doc.text(`Due Date: ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("en-GB") : "-"}`, rightX);
+  doc.text(`Total Amount ₹ ${invoice.amount.toFixed(2)}`, rightX);
+
+  doc.moveDown(2);
+
+  // =========================
+  // PRODUCT TABLE HEADER
+  // =========================
+  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+  doc.moveDown(0.5);
+
+  doc.font("Helvetica-Bold");
+  doc.text("Products Description", 50);
+  doc.text("Price", 320);
+  doc.text("Qty", 400);
+  doc.text("Amount", 460);
+
+  doc.moveDown(0.5);
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown();
 
-  // INVOICE DETAILS
-  doc.fontSize(12)
-     .text(`Invoice No: ${invoice.invoiceNumber || invoice._id}`, { align: "right" });
-  doc.text(`Date: ${new Date(invoice.createdAt).toDateString()}`, { align: "right" });
+  // =========================
+  // PRODUCT ROW
+  // =========================
+  doc.font("Helvetica");
+
+  const price = Number(invoice.amount) - 900; // example tax logic
+  const qty = 1;
+  const tax = invoice.amount - price;
+
+  doc.text(
+    `${invoice.productName || ""} - ${invoice.issue || ""}\nserial no : ${invoice.serialNo || ""}`,
+    50
+  );
+
+  doc.text(`₹ ${price.toFixed(2)}`, 320, doc.y - 30);
+  doc.text(`${qty}`, 400, doc.y - 30);
+  doc.text(`₹ ${invoice.amount.toFixed(2)}`, 460, doc.y - 30);
 
   doc.moveDown(2);
 
-  // FROM & BILL TO
-  const fromY = doc.y;
+  // =========================
+  // TOTALS SECTION
+  // =========================
+  doc.font("Helvetica-Bold");
 
-  doc.rect(50, fromY, 250, 120).stroke();
-  doc.fontSize(12).fillColor("#0d6efd")
-     .text("FROM:", 60, fromY + 10);
+  doc.text(`SubTotal ₹ ${price.toFixed(2)}`, 350);
+  doc.text(`Total Tax ₹ ${tax.toFixed(2)}`, 350);
+  doc.text(`Total Amount ₹ ${invoice.amount.toFixed(2)}`, 350);
+  doc.text(`Balance Due ₹ 0.00`, 350);
 
-  doc.fillColor("black").fontSize(11)
-     .text("iPremium Care", 60)
-     .text("iPremium India - HSR Layout")
-     .text("114-115, 80 ft road, 27th Main Rd")
-     .text("Bengaluru, Karnataka - 560102")
-     .text("GST: 29AAKFI8994H1ZH")
-     .text("Phone: 8884417766")
-     .text("Email: support@ipremiumindia.co.in");
+  doc.moveDown(1.5);
 
-  doc.rect(320, fromY, 230, 120).stroke();
-  doc.fillColor("#0d6efd").fontSize(12)
-     .text("BILL TO:", 330, fromY + 10);
-
-  doc.fillColor("black").fontSize(11)
-     .text(`Name: ${flattened.name || "N/A"}`, 330)
-     .text(`Phone: ${flattened.phone || "N/A"}`)
-     .text(`Email: ${flattened.email || "N/A"}`);
-
-  doc.y = fromY + 140;
-
-  // PRODUCT DETAILS
-  doc.fontSize(12).fillColor("black")
-     .text("Product Details", { underline: true });
-
-  doc.moveDown(0.5);
-  doc.fontSize(11)
-     .text(`Product: ${invoice.productName || "-"}`)
-     .text(`Brand: ${invoice.brand || "-"}`)
-     .text(`Model: ${invoice.model || "-"}`)
-     .text(`Serial No: ${invoice.serialNo || "-"}`)
-     .text(`Issue: ${invoice.issue || "-"}`);
-
-  doc.moveDown(2);
-
-  // TOTAL AMOUNT BOX (FIXED)
-  const totalBoxY = doc.y;
-
-  doc.rect(50, totalBoxY, 500, 45)
-     .fillAndStroke("#f8f9fa", "#dee2e6");
-
-  doc.fillColor("#198754")
-     .fontSize(18)
-     .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, totalBoxY + 12);
-
-  // 🔥 IMPORTANT FIX
-  doc.y = totalBoxY + 65;
-
-  // If near page end, add new page
-  if (doc.y > 700) {
-    doc.addPage();
+  // =========================
+  // NOTES
+  // =========================
+  if (invoice.notes) {
+    doc.font("Helvetica-Bold").text("Note:");
+    doc.font("Helvetica").text(invoice.notes);
+    doc.moveDown();
   }
 
-  // ==============================
-// TERMS & CONDITIONS (FORCE NEW PAGE)
-// ==============================
+  // =========================
+  // PAYMENT & WARRANTY SECTION
+  // =========================
+  doc.addPage();
 
-doc.addPage(); // 🔥 Always start terms in new page
+  doc.fontSize(14).font("Helvetica-Bold")
+     .text("PAYMENT & WARRANTY");
 
-doc.fontSize(14)
-   .fillColor("#0d6efd")
-   .text("Terms & Conditions", { underline: true });
+  doc.moveDown();
 
-doc.moveDown(1);
+  doc.fontSize(10).font("Helvetica");
 
-doc.fontSize(10).fillColor("black");
+  const terms = [
+    "1. Payment: Full payment is required upon delivery. No credit period is provided.",
+    "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
+    "3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
+    "4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is not covered.",
+    "5. Warranty Conditions:",
+    "   a. Warranty covers only parts replaced by us.",
+    "   b. Warranty is void for partial repairs or third-party diagnostics/repairs.",
+    "6. Device Collection: Collect repaired devices within 3 months to avoid maintenance charges.",
+    "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
+  ];
 
-const terms = [
-  "1. Payment: Full payment is required upon delivery. No credit period is provided.",
-  "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
-  "3. Diagnostic Charges: Fees apply if quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
-  "4. Warranty Exclusions: Physical damage, power issues, liquid exposure, or accidents are not covered.",
-  "5. Warranty Conditions:",
-  "   a. Warranty covers only parts replaced by us.",
-  "   b. Warranty void for partial repairs or third-party service.",
-  "6. Device Collection: Collect repaired devices within 3 months to avoid handling charges.",
-  "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
-];
-
-terms.forEach(line => {
-  doc.text(line, {
-    width: 500,
-    align: "left"
+  terms.forEach(line => {
+    doc.text(line, { width: 500 });
+    doc.moveDown(0.5);
   });
-  doc.moveDown(0.5);
-});
 
+  doc.end();
+};
   // FOOTER
   doc.fontSize(10)
      .text("Thank you for your business!", { align: "center" });
