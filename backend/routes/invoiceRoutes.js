@@ -199,9 +199,8 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   // TERMS & CONDITIONS (SAME PAGE)
   // =========================
-
- // =========================
-// TERMS & CONDITIONS (PROPER CENTER BLOCK)
+// =========================
+// TERMS & CONDITIONS (FULL CENTER ALIGN)
 // =========================
 
 if (doc.y > 680) {
@@ -210,7 +209,7 @@ if (doc.y > 680) {
 
 doc.moveDown(1.5);
 
-// Centered Title
+// Center Title
 doc.fontSize(12)
    .font("Helvetica-Bold")
    .text("TERMS & CONDITIONS", {
@@ -219,38 +218,25 @@ doc.fontSize(12)
 
 doc.moveDown(0.8);
 
-// Define centered content width
-const termsWidth = 420;
-const centerX = (doc.page.width - termsWidth) / 2;
-
 doc.fontSize(9).font("Helvetica");
 
-// Draw subtle divider line above
-doc.moveTo(centerX, doc.y - 5)
-   .lineTo(centerX + termsWidth, doc.y - 5)
-   .stroke();
+// Center each line properly
+const terms = [
+  "1. Full payment is required upon delivery of the repaired device.",
+  "2. All sales are final. No refunds after service completion.",
+  "3. Diagnostic charges apply if repair is not approved.",
+  "4. Warranty does not cover physical or liquid damage.",
+  "5. Warranty applies only to replaced parts.",
+  "6. Devices must be collected within 90 days.",
+  "7. Jurisdiction: Bengaluru, Karnataka."
+];
 
-// Terms Content
-const termsText = `
-1. Full payment is required upon delivery of the repaired device.
-
-2. All sales are final. No refunds will be issued after service completion.
-
-3. Diagnostic charges are applicable if the repair quotation is not approved.
-
-4. Warranty does not cover physical damage, water damage, or tampering.
-
-5. Warranty is applicable only to replaced parts and not the entire device.
-
-6. Devices must be collected within 90 days from completion date.
-
-7. Any disputes are subject to Bengaluru, Karnataka jurisdiction only.
-`;
-
-doc.text(termsText.trim(), centerX, doc.y, {
-  width: termsWidth,
-  align: "left",
-  lineGap: 4
+terms.forEach(line => {
+  doc.text(line, {
+    align: "center",
+    width: 450
+  });
+  doc.moveDown(0.5);
 });
 
 doc.moveDown(2);
