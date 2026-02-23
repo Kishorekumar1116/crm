@@ -7,6 +7,11 @@ const invoiceSchema = new mongoose.Schema({
   invoiceNumber: { type: String, unique: true }, // Auto-generate
   amount: { type: Number, required: true },
   notes: { type: String },
+  productName: String,
+  brand: String,
+  model: String,
+  serialNo: String,
+  issue: String,
 
   // Payment & status
   status: { type: String, enum: ["Unpaid", "Partial", "Paid"], default: "Unpaid" },
