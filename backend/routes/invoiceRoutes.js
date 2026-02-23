@@ -30,7 +30,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(1.5);
 
   // =========================
-  // FROM SECTION
+  // FROM
   // =========================
   doc.fontSize(11).font("Helvetica-Bold").text("From");
   doc.font("Helvetica");
@@ -46,7 +46,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown();
 
   // =========================
-  // TO SECTION
+  // TO
   // =========================
   doc.font("Helvetica-Bold").text("To");
   doc.font("Helvetica");
@@ -60,19 +60,26 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(1.5);
 
   // =========================
-  // INVOICE INFO (RIGHT SIDE)
+  // RIGHT SIDE INFO
   // =========================
   const rightX = 350;
-
   doc.font("Helvetica-Bold");
+
   doc.text(`Invoice # IPI ${invoice.invoiceNumber || invoice._id}`, rightX, 120);
-  doc.text(`Due Date: ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("en-GB") : "-"}`, rightX);
-  doc.text(`Total Amount ₹ ${invoice.amount.toFixed(2)}`, rightX);
+  doc.text(
+    `Due Date: ${
+      invoice.dueDate
+        ? new Date(invoice.dueDate).toLocaleDateString("en-GB")
+        : "-"
+    }`,
+    rightX
+  );
+  doc.text(`Total Amount ₹ ${Number(invoice.amount).toFixed(2)}`, rightX);
 
   doc.moveDown(2);
 
   // =========================
-  // PRODUCT TABLE HEADER
+  // TABLE HEADER
   // =========================
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown(0.5);
@@ -92,29 +99,33 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   doc.font("Helvetica");
 
-  const price = Number(invoice.amount) - 900; // example tax logic
+  const total = Number(invoice.amount);
+  const gstRate = 0.18;
+  const subTotal = total / (1 + gstRate);
+  const tax = total - subTotal;
   const qty = 1;
-  const tax = invoice.amount - price;
+
+  const currentY = doc.y;
 
   doc.text(
     `${invoice.productName || ""} - ${invoice.issue || ""}\nserial no : ${invoice.serialNo || ""}`,
     50
   );
 
-  doc.text(`₹ ${price.toFixed(2)}`, 320, doc.y - 30);
-  doc.text(`${qty}`, 400, doc.y - 30);
-  doc.text(`₹ ${invoice.amount.toFixed(2)}`, 460, doc.y - 30);
+  doc.text(`₹ ${subTotal.toFixed(2)}`, 320, currentY);
+  doc.text(`${qty}`, 400, currentY);
+  doc.text(`₹ ${total.toFixed(2)}`, 460, currentY);
 
   doc.moveDown(2);
 
   // =========================
-  // TOTALS SECTION
+  // TOTALS
   // =========================
   doc.font("Helvetica-Bold");
 
-  doc.text(`SubTotal ₹ ${price.toFixed(2)}`, 350);
-  doc.text(`Total Tax ₹ ${tax.toFixed(2)}`, 350);
-  doc.text(`Total Amount ₹ ${invoice.amount.toFixed(2)}`, 350);
+  doc.text(`SubTotal ₹ ${subTotal.toFixed(2)}`, 350);
+  doc.text(`Total Tax (18%) ₹ ${tax.toFixed(2)}`, 350);
+  doc.text(`Total Amount ₹ ${total.toFixed(2)}`, 350);
   doc.text(`Balance Due ₹ 0.00`, 350);
 
   doc.moveDown(1.5);
@@ -129,7 +140,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   }
 
   // =========================
-  // PAYMENT & WARRANTY SECTION
+  // TERMS PAGE
   // =========================
   doc.addPage();
 
@@ -137,19 +148,16 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text("PAYMENT & WARRANTY");
 
   doc.moveDown();
-
   doc.fontSize(10).font("Helvetica");
 
   const terms = [
-    "1. Payment: Full payment is required upon delivery. No credit period is provided.",
-    "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
-    "3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
-    "4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is not covered.",
-    "5. Warranty Conditions:",
-    "   a. Warranty covers only parts replaced by us.",
-    "   b. Warranty is void for partial repairs or third-party diagnostics/repairs.",
-    "6. Device Collection: Collect repaired devices within 3 months to avoid maintenance charges.",
-    "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
+    "1. Payment: Full payment is required upon delivery.",
+    "2. Returns and Refunds: All sales are final.",
+    "3. Diagnostic Charges apply if quotation is not approved.",
+    "4. Warranty Exclusions: Physical damage, liquid exposure not covered.",
+    "5. Warranty applies only to replaced parts.",
+    "6. Collect repaired devices within 3 months.",
+    "7. Jurisdiction: Bengaluru only."
   ];
 
   terms.forEach(line => {
@@ -157,14 +165,19 @@ const generatePDFContent = (doc, invoice, flattened) => {
     doc.moveDown(0.5);
   });
 
-  doc.end();
-};
-  // FOOTER
+  doc.moveDown(2);
+
+  // =========================
+  // FOOTER (CORRECT POSITION)
+  // =========================
   doc.fontSize(10)
+     .font("Helvetica-Oblique")
      .text("Thank you for your business!", { align: "center" });
 
+  // ✅ END ONLY ONCE
   doc.end();
 };
+
 
 // ==============================
 // 1. CREATE INVOICE
