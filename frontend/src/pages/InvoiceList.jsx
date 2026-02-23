@@ -108,6 +108,7 @@ function InvoiceList() {
 <th>Model</th>
 <th>Serial No</th>
 <th>Issue</th>
+                <th>Notes</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
@@ -135,6 +136,7 @@ function InvoiceList() {
                     <td>{inv.model || "-"}</td>
                     <td>{inv.serialNo || "-"}</td>
                     <td>{inv.issue || "-"}</td>
+                    <td>{inv.notes || "-"}</td>
                     <td className="text-center">
                       <button 
                         onClick={() => viewPdf(inv._id)} 
