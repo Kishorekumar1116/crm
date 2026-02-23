@@ -32,16 +32,14 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown();
 
-  // INVOICE DETAILS (Right Side)
+  // INVOICE DETAILS
   doc.fontSize(12)
      .text(`Invoice No: ${invoice.invoiceNumber || invoice._id}`, { align: "right" });
   doc.text(`Date: ${new Date(invoice.createdAt).toDateString()}`, { align: "right" });
 
   doc.moveDown(2);
 
-  // ==============================
-  // FROM SECTION
-  // ==============================
+  // FROM
   const fromY = doc.y;
 
   doc.rect(50, fromY, 250, 120).stroke("#2c3e50");
@@ -59,9 +57,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text("Phone: 8884417766")
      .text("Email: support@ipremiumindia.co.in");
 
-  // ==============================
-  // BILL TO SECTION
-  // ==============================
+  // BILL TO
   doc.rect(320, fromY, 230, 120).stroke("#2c3e50");
 
   doc.fillColor("#0d6efd").fontSize(12)
@@ -74,9 +70,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.moveDown(8);
 
-  // ==============================
-  // 🔥 PRODUCT DETAILS SECTION (NEWLY ADDED)
-  // ==============================
+  // PRODUCT DETAILS
   doc.fontSize(12).fillColor("black")
      .text("Product Details", { underline: true });
 
@@ -89,6 +83,52 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text(`Issue: ${invoice.issue || "-"}`);
 
   doc.moveDown(2);
+
+  // TOTAL AMOUNT
+  doc.rect(50, doc.y, 500, 45)
+     .fill("#f8f9fa")
+     .stroke("#dee2e6");
+
+  doc.fillColor("#198754")
+     .fontSize(18)
+     .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, doc.y + 12);
+
+  doc.moveDown(3);
+
+  // ==============================
+  // 🔥 TERMS & CONDITIONS (NEW)
+  // ==============================
+
+  // If space is less, move to new page
+  if (doc.y > 650) {
+    doc.addPage();
+  }
+
+  doc.moveDown();
+  doc.fontSize(12).fillColor("#0d6efd")
+     .text("Terms & Conditions", { underline: true });
+
+  doc.moveDown(0.5);
+  doc.fillColor("black").fontSize(9);
+
+  doc.text("1. Payment: Full payment is required upon delivery. No credit period is provided.");
+  doc.text("2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.");
+  doc.text("3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if the customer approves the repair within 30 days.");
+  doc.text("4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is not covered.");
+  doc.text("5. Warranty Conditions:");
+  doc.text("   a. Warranty covers only parts replaced by us.");
+  doc.text("   b. Warranty is void for partial repairs, unreplaced faulty components, or third-party diagnostics/repairs.");
+  doc.text("6. Device Collection: Collect repaired devices within 3 months to avoid maintenance and handling charges.");
+  doc.text("7. Jurisdiction: Disputes are subject to Bengaluru jurisdiction only.");
+
+  doc.moveDown(2);
+
+  // FOOTER
+  doc.fontSize(10)
+     .text("Thank you for your business!", { align: "center" });
+
+  doc.end();
+};
 
   // ==============================
   // TOTAL AMOUNT BOX
