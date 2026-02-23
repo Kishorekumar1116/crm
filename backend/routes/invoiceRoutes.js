@@ -26,46 +26,41 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   // TITLE
   // =========================
-  doc.fontSize(26).text("Invoice", { align: "center" });
-  doc.moveDown(1.5);
+  doc.fontSize(24).font("Helvetica-Bold").text("INVOICE", {
+    align: "center",
+  });
+
+  doc.moveDown(2);
 
   // =========================
-  // FROM
+  // HEADER BLOCK (LEFT + RIGHT PERFECT ALIGN)
   // =========================
-  doc.fontSize(11).font("Helvetica-Bold").text("From");
+  const startY = doc.y;
+  const leftX = 50;
+  const rightX = 350;
+
+  // LEFT SIDE (FROM)
+  doc.fontSize(11).font("Helvetica-Bold");
+  doc.text("From", leftX, startY);
+
   doc.font("Helvetica");
-
-  doc.text("iPremium India - HSR Layout");
-  doc.text("114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout");
-  doc.text("Bengaluru, Karnataka");
-  doc.text("India - 560102");
+  doc.text("iPremium India - HSR Layout", leftX);
+  doc.text("114-115, 80 ft road, 27th Main Rd, 2nd Sector");
+  doc.text("HSR Layout, Bengaluru, Karnataka - 560102");
   doc.text("Phone: 8884417766");
   doc.text("Email: support@ipremiumindia.co.in");
-  doc.text("TAX ID : 29AAKFI8994H1ZH");
+  doc.text("TAX ID: 29AAKFI8994H1ZH");
 
-  doc.moveDown();
+  const leftBottomY = doc.y;
 
-  // =========================
-  // TO
-  // =========================
-  doc.font("Helvetica-Bold").text("To");
-  doc.font("Helvetica");
-
-  doc.text(flattened.name || "");
-  doc.text("Bengaluru, Karnataka");
-  doc.text("India -");
-  doc.text(`Phone: ${flattened.phone || ""}`);
-  doc.text(`Email: ${flattened.email || ""}`);
-
-  doc.moveDown(1.5);
-
-  // =========================
-  // RIGHT SIDE INFO
-  // =========================
-  const rightX = 350;
+  // RIGHT SIDE (Invoice Info)
   doc.font("Helvetica-Bold");
+  doc.text(
+    `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
+    rightX,
+    startY
+  );
 
-  doc.text(`Invoice # IPI ${invoice.invoiceNumber || invoice._id}`, rightX, 120);
   doc.text(
     `Due Date: ${
       invoice.dueDate
@@ -74,149 +69,143 @@ const generatePDFContent = (doc, invoice, flattened) => {
     }`,
     rightX
   );
-  doc.text(`Total Amount ₹ ${Number(invoice.amount).toFixed(2)}`, rightX);
+
+  doc.text(
+    `Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`,
+    rightX
+  );
+
+  const rightBottomY = doc.y;
+
+  // Move below whichever is taller
+  doc.y = Math.max(leftBottomY, rightBottomY) + 30;
+
+  // =========================
+  // TO SECTION
+  // =========================
+  doc.font("Helvetica-Bold").text("To", 50);
+  doc.font("Helvetica");
+
+  doc.text(flattened.name || "");
+  doc.text("Bengaluru, Karnataka");
+  doc.text("India -");
+  doc.text(`Phone: ${flattened.phone || ""}`);
+  doc.text(`Email: ${flattened.email || ""}`);
 
   doc.moveDown(2);
 
   // =========================
-  // TABLE HEADER
+  // TABLE
   // =========================
- // =========================
-// TABLE HEADER
-// =========================
-const tableTop = doc.y;
-const itemX = 50;
-const priceX = 340;
-const qtyX = 420;
-const amountX = 470;
+  const tableTop = doc.y;
+  const itemX = 50;
+  const priceX = 330;
+  const qtyX = 410;
+  const amountX = 470;
 
-doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
+  doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
 
-doc.font("Helvetica-Bold");
-doc.text("Description", itemX, tableTop);
-doc.text("Price", priceX, tableTop, { width: 60, align: "right" });
-doc.text("Qty", qtyX, tableTop, { width: 40, align: "right" });
-doc.text("Amount", amountX, tableTop, { width: 80, align: "right" });
+  doc.font("Helvetica-Bold");
+  doc.text("Description", itemX, tableTop);
+  doc.text("Price", priceX, tableTop, { width: 60, align: "right" });
+  doc.text("Qty", qtyX, tableTop, { width: 40, align: "right" });
+  doc.text("Amount", amountX, tableTop, { width: 80, align: "right" });
 
-doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
-
-doc.moveDown(1.5);
-
-// =========================
-// PRODUCT ROW (ALIGNED)
-// =========================
-doc.font("Helvetica");
-
-const total = Number(invoice.amount);
-const gstRate = 0.18;
-const subTotal = total / (1 + gstRate);
-const tax = total - subTotal;
-const qty = 1;
-
-const description = `${invoice.productName || ""} - ${invoice.issue || ""}
-Serial No: ${invoice.serialNo || ""}`;
-
-const rowTop = doc.y;
-
-// Description (fixed width)
-doc.text(description, itemX, rowTop, {
-  width: 260,
-});
-
-// Capture height of description block
-const descriptionHeight = doc.heightOfString(description, {
-  width: 260,
-});
-
-// Right aligned numeric columns
-doc.text(`₹ ${subTotal.toFixed(2)}`, priceX, rowTop, {
-  width: 60,
-  align: "right",
-});
-
-doc.text(`${qty}`, qtyX, rowTop, {
-  width: 40,
-  align: "right",
-});
-
-doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
-  width: 80,
-  align: "right",
-});
-
-// Move Y correctly after tallest column
-doc.y = rowTop + descriptionHeight + 10;
-
-// Bottom line
-doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
-
-doc.moveDown(2);
-
-// =========================
-// TOTALS (RIGHT ALIGNED CLEAN)
-// =========================
-doc.font("Helvetica-Bold");
-
-doc.text(`SubTotal`, 350, doc.y, { continued: true });
-doc.text(`₹ ${subTotal.toFixed(2)}`, { align: "right" });
-
-doc.text(`GST (18%)`, 350, doc.y, { continued: true });
-doc.text(`₹ ${tax.toFixed(2)}`, { align: "right" });
-
-doc.text(`Total Amount`, 350, doc.y, { continued: true });
-doc.text(`₹ ${total.toFixed(2)}`, { align: "right" });
-
-doc.text(`Balance Due`, 350, doc.y, { continued: true });
-doc.text(`₹ 0.00`, { align: "right" });
-
-doc.moveDown(1.5);
-  
+  doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+  doc.moveDown(1.5);
 
   // =========================
-  // NOTES
+  // PRODUCT ROW
   // =========================
-  if (invoice.notes) {
-    doc.font("Helvetica-Bold").text("Note:");
-    doc.font("Helvetica").text(invoice.notes);
-    doc.moveDown();
-  }
+  doc.font("Helvetica");
 
-  // =========================
-  // TERMS PAGE
-  // =========================
-  doc.addPage();
+  const total = Number(invoice.amount);
+  const gstRate = 0.18;
+  const subTotal = total / (1 + gstRate);
+  const tax = total - subTotal;
+  const qty = 1;
 
-  doc.fontSize(14).font("Helvetica-Bold")
-     .text("PAYMENT & WARRANTY");
+  const description = `${invoice.productName || ""} - ${invoice.issue || ""}\nSerial No: ${invoice.serialNo || ""}`;
 
-  doc.moveDown();
-  doc.fontSize(10).font("Helvetica");
+  const rowTop = doc.y;
 
-  const terms = [
-    "1. Payment: Full payment is required upon delivery.",
-    "2. Returns and Refunds: All sales are final.",
-    "3. Diagnostic Charges apply if quotation is not approved.",
-    "4. Warranty Exclusions: Physical damage, liquid exposure not covered.",
-    "5. Warranty applies only to replaced parts.",
-    "6. Collect repaired devices within 3 months.",
-    "7. Jurisdiction: Bengaluru only."
-  ];
+  doc.text(description, itemX, rowTop, { width: 260 });
 
-  terms.forEach(line => {
-    doc.text(line, { width: 500 });
-    doc.moveDown(0.5);
+  const descriptionHeight = doc.heightOfString(description, {
+    width: 260,
   });
 
+  doc.text(`₹ ${subTotal.toFixed(2)}`, priceX, rowTop, {
+    width: 60,
+    align: "right",
+  });
+
+  doc.text(`${qty}`, qtyX, rowTop, {
+    width: 40,
+    align: "right",
+  });
+
+  doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
+    width: 80,
+    align: "right",
+  });
+
+  doc.y = rowTop + descriptionHeight + 10;
+
+  doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown(2);
 
   // =========================
-  // FOOTER (CORRECT POSITION)
+  // TOTALS (CLEAN ALIGN)
+  // =========================
+  doc.font("Helvetica-Bold");
+
+  const totalsXLabel = 360;
+  const totalsXAmount = 460;
+  let totalsY = doc.y;
+  const lineGap = 18;
+
+  doc.text("SubTotal", totalsXLabel, totalsY);
+  doc.text(`₹ ${subTotal.toFixed(2)}`, totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
+
+  totalsY += lineGap;
+
+  doc.text("GST (18%)", totalsXLabel, totalsY);
+  doc.text(`₹ ${tax.toFixed(2)}`, totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
+
+  totalsY += lineGap;
+
+  doc.text("Total Amount", totalsXLabel, totalsY);
+  doc.text(`₹ ${total.toFixed(2)}`, totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
+
+  totalsY += lineGap;
+
+  doc.text("Balance Due", totalsXLabel, totalsY);
+  doc.text("₹ 0.00", totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
+
+  doc.y = totalsY + 30;
+
+  // =========================
+  // FOOTER
   // =========================
   doc.fontSize(10)
-     .font("Helvetica-Oblique")
-     .text("Thank you for your business!", { align: "center" });
+    .font("Helvetica-Oblique")
+    .text("Thank you for your business!", {
+      align: "center",
+    });
 
-  // ✅ END ONLY ONCE
   doc.end();
 };
 
