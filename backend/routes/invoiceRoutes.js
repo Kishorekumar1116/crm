@@ -1,3 +1,4 @@
+
 const router = require("express").Router();
 const Invoice = require("../models/Invoice");
 const Customer = require("../models/Customer");
@@ -32,14 +33,16 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown();
 
-  // INVOICE DETAILS
+  // INVOICE DETAILS (Right Side)
   doc.fontSize(12)
      .text(`Invoice No: ${invoice.invoiceNumber || invoice._id}`, { align: "right" });
   doc.text(`Date: ${new Date(invoice.createdAt).toDateString()}`, { align: "right" });
 
   doc.moveDown(2);
 
-  // FROM
+  // ==============================
+  // FROM SECTION
+  // ==============================
   const fromY = doc.y;
 
   doc.rect(50, fromY, 250, 120).stroke("#2c3e50");
@@ -57,7 +60,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text("Phone: 8884417766")
      .text("Email: support@ipremiumindia.co.in");
 
-  // BILL TO
+  // ==============================
+  // BILL TO SECTION
+  // ==============================
   doc.rect(320, fromY, 230, 120).stroke("#2c3e50");
 
   doc.fillColor("#0d6efd").fontSize(12)
@@ -70,7 +75,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.moveDown(8);
 
-  // PRODUCT DETAILS
+  // ==============================
+  // 🔥 PRODUCT DETAILS SECTION (NEWLY ADDED)
+  // ==============================
   doc.fontSize(12).fillColor("black")
      .text("Product Details", { underline: true });
 
@@ -84,7 +91,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.moveDown(2);
 
-  // TOTAL AMOUNT
+  // ==============================
+  // TOTAL AMOUNT BOX
+  // ==============================
   doc.rect(50, doc.y, 500, 45)
      .fill("#f8f9fa")
      .stroke("#dee2e6");
@@ -93,7 +102,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .fontSize(18)
      .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, doc.y + 12);
 
-  doc.moveDown(3);
+  doc.moveDown(4);
 
   // ==============================
   // 🔥 TERMS & CONDITIONS (NEW)
@@ -129,20 +138,6 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.end();
 };
-
-  // ==============================
-  // TOTAL AMOUNT BOX
-  // ==============================
-  doc.rect(50, doc.y, 500, 45)
-     .fill("#f8f9fa")
-     .stroke("#dee2e6");
-
-  doc.fillColor("#198754")
-     .fontSize(18)
-     .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, doc.y + 12);
-
-  doc.moveDown(4);
-
   // FOOTER
   doc.fillColor("black")
      .fontSize(10)
