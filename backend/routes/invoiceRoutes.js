@@ -237,10 +237,8 @@ doc.moveTo(centerX, doc.y - 5)
 const termsText = `
 1. Payment: Full payment is required upon delivery. No credit period is provided.
 2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.
-3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if the
-customer approves the repair within 30 days.
-4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is
-not covered.
+3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if the customer approves the repair within 30 days.
+4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is not covered.
 5. Warranty Conditions:
 a. Warranty covers only parts replaced by us.
 b. Warranty is void for partial repairs, unreplaced faulty components, or third-party diagnostics/repairs.
