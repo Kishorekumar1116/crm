@@ -252,6 +252,9 @@ doc.text(termsText.trim(), centerX, doc.y, {
   lineGap: 2
 });
 
+  doc.moveDown(2);
+doc.end();
+};
 
 
 // ==============================
