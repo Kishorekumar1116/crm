@@ -40,7 +40,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(2);
 
   // ==============================
-  // FROM SECTION (PROFESSIONAL BOX)
+  // FROM SECTION
   // ==============================
   const fromY = doc.y;
 
@@ -73,6 +73,22 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text(`Email: ${flattened.email || "N/A"}`);
 
   doc.moveDown(8);
+
+  // ==============================
+  // 🔥 PRODUCT DETAILS SECTION (NEWLY ADDED)
+  // ==============================
+  doc.fontSize(12).fillColor("black")
+     .text("Product Details", { underline: true });
+
+  doc.moveDown(0.5);
+  doc.fontSize(11)
+     .text(`Product: ${invoice.productName || "-"}`)
+     .text(`Brand: ${invoice.brand || "-"}`)
+     .text(`Model: ${invoice.model || "-"}`)
+     .text(`Serial No: ${invoice.serialNo || "-"}`)
+     .text(`Issue: ${invoice.issue || "-"}`);
+
+  doc.moveDown(2);
 
   // ==============================
   // TOTAL AMOUNT BOX
