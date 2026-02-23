@@ -235,25 +235,23 @@ doc.moveTo(centerX, doc.y - 5)
 
 // Terms Content
 const termsText = `
-1. Full payment is required upon delivery of the repaired device.
-
-2. All sales are final. No refunds will be issued after service completion.
-
-3. Diagnostic charges are applicable if the repair quotation is not approved.
-
-4. Warranty does not cover physical damage, water damage, or tampering.
-
-5. Warranty is applicable only to replaced parts and not the entire device.
-
-6. Devices must be collected within 90 days from completion date.
-
-7. Any disputes are subject to Bengaluru, Karnataka jurisdiction only.
+1. Payment: Full payment is required upon delivery. No credit period is provided.
+2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.
+3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if the
+customer approves the repair within 30 days.
+4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is
+not covered.
+5. Warranty Conditions:
+a. Warranty covers only parts replaced by us.
+b. Warranty is void for partial repairs, unreplaced faulty components, or third-party diagnostics/repairs.
+6. Device Collection: Collect repaired devices within 3 months to avoid maintenance and handling charges.
+7. Jurisdiction: Disputes are subject to Bengaluru jurisdiction only.
 `;
 
 doc.text(termsText.trim(), centerX, doc.y, {
   width: termsWidth,
   align: "left",
-  lineGap: 4
+  lineGap: 2
 });
 
 doc.moveDown(2);
