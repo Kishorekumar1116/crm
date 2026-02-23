@@ -33,38 +33,30 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown();
 
-  // INVOICE DETAILS (Right Side)
+  // INVOICE DETAILS
   doc.fontSize(12)
      .text(`Invoice No: ${invoice.invoiceNumber || invoice._id}`, { align: "right" });
   doc.text(`Date: ${new Date(invoice.createdAt).toDateString()}`, { align: "right" });
 
   doc.moveDown(2);
 
-  // ==============================
-  // FROM SECTION
-  // ==============================
+  // FROM & BILL TO
   const fromY = doc.y;
 
-  doc.rect(50, fromY, 250, 120).stroke("#2c3e50");
-
+  doc.rect(50, fromY, 250, 120).stroke();
   doc.fontSize(12).fillColor("#0d6efd")
      .text("FROM:", 60, fromY + 10);
 
   doc.fillColor("black").fontSize(11)
      .text("iPremium Care", 60)
-     .moveDown(0.5)
      .text("iPremium India - HSR Layout")
-     .text("114-115, 80 ft road, 27th Main Rd, HSR Layout")
+     .text("114-115, 80 ft road, 27th Main Rd")
      .text("Bengaluru, Karnataka - 560102")
      .text("GST: 29AAKFI8994H1ZH")
      .text("Phone: 8884417766")
      .text("Email: support@ipremiumindia.co.in");
 
-  // ==============================
-  // BILL TO SECTION
-  // ==============================
-  doc.rect(320, fromY, 230, 120).stroke("#2c3e50");
-
+  doc.rect(320, fromY, 230, 120).stroke();
   doc.fillColor("#0d6efd").fontSize(12)
      .text("BILL TO:", 330, fromY + 10);
 
@@ -73,11 +65,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .text(`Phone: ${flattened.phone || "N/A"}`)
      .text(`Email: ${flattened.email || "N/A"}`);
 
-  doc.moveDown(8);
+  doc.y = fromY + 140;
 
-  // ==============================
-  // 🔥 PRODUCT DETAILS SECTION (NEWLY ADDED)
-  // ==============================
+  // PRODUCT DETAILS
   doc.fontSize(12).fillColor("black")
      .text("Product Details", { underline: true });
 
@@ -91,44 +81,49 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.moveDown(2);
 
-  // ==============================
-  // TOTAL AMOUNT BOX
-  // ==============================
-  doc.rect(50, doc.y, 500, 45)
-     .fill("#f8f9fa")
-     .stroke("#dee2e6");
+  // TOTAL AMOUNT BOX (FIXED)
+  const totalBoxY = doc.y;
+
+  doc.rect(50, totalBoxY, 500, 45)
+     .fillAndStroke("#f8f9fa", "#dee2e6");
 
   doc.fillColor("#198754")
      .fontSize(18)
-     .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, doc.y + 12);
+     .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, totalBoxY + 12);
 
-  doc.moveDown(3);
+  // 🔥 IMPORTANT FIX
+  doc.y = totalBoxY + 65;
 
-  // ==============================
-  // 🔥 TERMS & CONDITIONS (NEW)
-  // ==============================
-
-  // If space is less, move to new page
-  if (doc.y > 650) {
+  // If near page end, add new page
+  if (doc.y > 700) {
     doc.addPage();
   }
 
-  doc.moveDown();
+  // TERMS & CONDITIONS
+  doc.moveDown(1);
+
   doc.fontSize(12).fillColor("#0d6efd")
      .text("Terms & Conditions", { underline: true });
 
   doc.moveDown(0.5);
-  doc.fillColor("black").fontSize(9);
+  doc.fontSize(9).fillColor("black");
 
-  doc.text("1. Payment: Full payment is required upon delivery. No credit period is provided.");
-  doc.text("2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.");
-  doc.text("3. Diagnostic Charges: Fees apply if the service quotation is not approved. These fees will be deducted if the customer approves the repair within 30 days.");
-  doc.text("4. Warranty Exclusions: Damage from physical impact, pressure, power fluctuations, liquid exposure, or accidents is not covered.");
-  doc.text("5. Warranty Conditions:");
-  doc.text("   a. Warranty covers only parts replaced by us.");
-  doc.text("   b. Warranty is void for partial repairs, unreplaced faulty components, or third-party diagnostics/repairs.");
-  doc.text("6. Device Collection: Collect repaired devices within 3 months to avoid maintenance and handling charges.");
-  doc.text("7. Jurisdiction: Disputes are subject to Bengaluru jurisdiction only.");
+  const terms = [
+    "1. Payment: Full payment is required upon delivery. No credit period is provided.",
+    "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
+    "3. Diagnostic Charges: Fees apply if quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
+    "4. Warranty Exclusions: Physical damage, power issues, liquid exposure, or accidents are not covered.",
+    "5. Warranty Conditions:",
+    "   a. Warranty covers only parts replaced by us.",
+    "   b. Warranty void for partial repairs or third-party service.",
+    "6. Device Collection: Collect repaired devices within 3 months to avoid handling charges.",
+    "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
+  ];
+
+  terms.forEach(line => {
+    doc.text(line, { width: 500 });
+    doc.moveDown(0.3);
+  });
 
   doc.moveDown(2);
 
@@ -138,7 +133,6 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.end();
 };
-  
 
 // ==============================
 // 1. CREATE INVOICE
