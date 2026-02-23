@@ -102,7 +102,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
      .fontSize(18)
      .text(`TOTAL AMOUNT: RS.${invoice.amount}`, 60, doc.y + 12);
 
-  doc.moveDown(4);
+  doc.moveDown(3);
 
   // ==============================
   // 🔥 TERMS & CONDITIONS (NEW)
@@ -138,13 +138,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.end();
 };
-  // FOOTER
-  doc.fillColor("black")
-     .fontSize(10)
-     .text("Thank you for your business!", { align: "center" });
-
-  doc.end();
-};
+  
 
 // ==============================
 // 1. CREATE INVOICE
