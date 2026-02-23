@@ -195,7 +195,41 @@ const generatePDFContent = (doc, invoice, flattened) => {
   });
 
   doc.y = totalsY + 25;
-  
+
+  // =========================
+// CUSTOMER NOTES
+// =========================
+
+if (invoice.notes) {
+
+  if (doc.y > 650) {
+    doc.addPage();
+  }
+
+  doc.moveDown(1.5);
+
+  const notesWidth = 420;
+  const notesX = (doc.page.width - notesWidth) / 2;
+
+  doc.fontSize(12)
+     .font("Helvetica-Bold")
+     .text("Additional Notes", notesX, doc.y, {
+       width: notesWidth,
+       align: "left"
+     });
+
+  doc.moveDown(0.5);
+
+  doc.fontSize(10)
+     .font("Helvetica")
+     .text(invoice.notes, notesX, doc.y, {
+       width: notesWidth,
+       align: "left",
+       lineGap: 4
+     });
+
+  doc.moveDown(1.5);
+}
 // =========================
 // TERMS & CONDITIONS (PERFECT CENTER MATCH)
 // =========================
