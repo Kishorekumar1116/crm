@@ -16,9 +16,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ==============================
-// PDF GENERATOR FUNCTION
-// ==============================
 const generatePDFContent = (doc, invoice, flattened) => {
   doc.font("Helvetica");
 
@@ -38,6 +35,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   const leftX = 50;
   const rightX = 350;
 
+  // FROM (LEFT)
   doc.fontSize(11).font("Helvetica-Bold");
   doc.text("From", leftX, startY);
 
@@ -51,19 +49,21 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   const leftBottomY = doc.y;
 
+  // INVOICE INFO (RIGHT) - DUE DATE REMOVED
   doc.font("Helvetica-Bold");
-  doc.text(`Invoice # IPI ${invoice.invoiceNumber || invoice._id}`, rightX, startY);
   doc.text(
-    `Due Date: ${
-      invoice.dueDate
-        ? new Date(invoice.dueDate).toLocaleDateString("en-GB")
-        : "-"
-    }`,
+    `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
+    rightX,
+    startY
+  );
+
+  doc.text(
+    `Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`,
     rightX
   );
-  doc.text(`Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`, rightX);
 
   const rightBottomY = doc.y;
+
   doc.y = Math.max(leftBottomY, rightBottomY) + 30;
 
   // =========================
@@ -74,7 +74,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.text(flattened.name || "");
   doc.text("Bengaluru, Karnataka");
-  doc.text("India");
+  doc.text("India -");
   doc.text(`Phone: ${flattened.phone || ""}`);
   doc.text(`Email: ${flattened.email || ""}`);
 
@@ -101,7 +101,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(1.5);
 
   // =========================
-  // PRODUCT ROW (NO GST)
+  // PRODUCT ROW (NO GST / NO SUBTOTAL)
   // =========================
   doc.font("Helvetica");
 
@@ -139,13 +139,14 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(2);
 
   // =========================
-  // TOTAL SECTION (ONLY TOTAL)
+  // TOTALS (ONLY TOTAL)
   // =========================
   doc.font("Helvetica-Bold");
 
   const totalsXLabel = 360;
   const totalsXAmount = 460;
   let totalsY = doc.y;
+  const lineGap = 18;
 
   doc.text("Total Amount", totalsXLabel, totalsY);
   doc.text(`₹ ${total.toFixed(2)}`, totalsXAmount, totalsY, {
@@ -153,7 +154,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
     align: "right",
   });
 
-  totalsY += 18;
+  totalsY += lineGap;
 
   doc.text("Balance Due", totalsXLabel, totalsY);
   doc.text("₹ 0.00", totalsXAmount, totalsY, {
@@ -163,6 +164,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.y = totalsY + 25;
 
+  // =========================
+  // NOTES & TERMS (UNCHANGED BELOW)
+  // =========================
   // =========================
   // CUSTOMER NOTES
   // =========================
