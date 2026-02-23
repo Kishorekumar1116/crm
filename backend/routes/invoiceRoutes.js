@@ -33,13 +33,13 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(2);
 
   // =========================
-  // HEADER BLOCK (LEFT + RIGHT PERFECT ALIGN)
+  // HEADER BLOCK
   // =========================
   const startY = doc.y;
   const leftX = 50;
   const rightX = 350;
 
-  // LEFT SIDE (FROM)
+  // FROM (LEFT)
   doc.fontSize(11).font("Helvetica-Bold");
   doc.text("From", leftX, startY);
 
@@ -53,7 +53,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   const leftBottomY = doc.y;
 
-  // RIGHT SIDE (Invoice Info)
+  // INVOICE INFO (RIGHT)
   doc.font("Helvetica-Bold");
   doc.text(
     `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
@@ -77,7 +77,6 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   const rightBottomY = doc.y;
 
-  // Move below whichever is taller
   doc.y = Math.max(leftBottomY, rightBottomY) + 30;
 
   // =========================
@@ -156,7 +155,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(2);
 
   // =========================
-  // TOTALS (CLEAN ALIGN)
+  // TOTALS
   // =========================
   doc.font("Helvetica-Bold");
 
@@ -195,7 +194,40 @@ const generatePDFContent = (doc, invoice, flattened) => {
     align: "right",
   });
 
-  doc.y = totalsY + 30;
+  doc.y = totalsY + 25;
+
+  // =========================
+  // TERMS & CONDITIONS (SAME PAGE)
+  // =========================
+
+  // If page almost full, add new page safely
+  if (doc.y > 700) {
+    doc.addPage();
+  }
+
+  doc.moveDown(1);
+
+  doc.fontSize(11).font("Helvetica-Bold").text("Terms & Conditions");
+
+  doc.moveDown(0.5);
+  doc.fontSize(9).font("Helvetica");
+
+  const terms = [
+    "1. Full payment is required upon delivery.",
+    "2. All sales are final. No refund after service completion.",
+    "3. Diagnostic charges apply if repair is not approved.",
+    "4. Warranty does not cover physical or liquid damage.",
+    "5. Warranty applies only to replaced parts.",
+    "6. Devices must be collected within 90 days.",
+    "7. Jurisdiction: Bengaluru, Karnataka."
+  ];
+
+  terms.forEach(line => {
+    doc.text(line, { width: 500 });
+    doc.moveDown(0.4);
+  });
+
+  doc.moveDown(2);
 
   // =========================
   // FOOTER
@@ -208,7 +240,6 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.end();
 };
-
 
 // ==============================
 // 1. CREATE INVOICE
