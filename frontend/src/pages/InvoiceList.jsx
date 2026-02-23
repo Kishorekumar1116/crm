@@ -104,6 +104,10 @@ function InvoiceList() {
                 <th>Customer Name</th>
                 <th>Phone</th>
                 <th>Amount</th>
+                <th>Product</th>
+<th>Model</th>
+<th>Serial No</th>
+<th>Issue</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
@@ -127,6 +131,10 @@ function InvoiceList() {
                     <td className="fw-bold">{inv.customerId?.name || inv.name || "N/A"}</td>
                     <td>{inv.customerId?.phone || inv.phone || "N/A"}</td>
                     <td className="text-success fw-bold">₹{inv.amount}</td>
+                    <td>{inv.productName || "-"}</td>
+                    <td>{inv.model || "-"}</td>
+                    <td>{inv.serialNo || "-"}</td>
+                    <td>{inv.issue || "-"}</td>
                     <td className="text-center">
                       <button 
                         onClick={() => viewPdf(inv._id)} 
