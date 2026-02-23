@@ -81,54 +81,96 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   // TABLE HEADER
   // =========================
-  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown(0.5);
+ // =========================
+// TABLE HEADER
+// =========================
+const tableTop = doc.y;
+const itemX = 50;
+const priceX = 340;
+const qtyX = 420;
+const amountX = 470;
 
-  doc.font("Helvetica-Bold");
-  doc.text("Products Description", 50);
-  doc.text("Price", 320);
-  doc.text("Qty", 400);
-  doc.text("Amount", 460);
+doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
 
-  doc.moveDown(0.5);
-  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown();
+doc.font("Helvetica-Bold");
+doc.text("Description", itemX, tableTop);
+doc.text("Price", priceX, tableTop, { width: 60, align: "right" });
+doc.text("Qty", qtyX, tableTop, { width: 40, align: "right" });
+doc.text("Amount", amountX, tableTop, { width: 80, align: "right" });
 
-  // =========================
-  // PRODUCT ROW
-  // =========================
-  doc.font("Helvetica");
+doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
 
-  const total = Number(invoice.amount);
-  const gstRate = 0.18;
-  const subTotal = total / (1 + gstRate);
-  const tax = total - subTotal;
-  const qty = 1;
+doc.moveDown(1.5);
 
-  const currentY = doc.y;
+// =========================
+// PRODUCT ROW (ALIGNED)
+// =========================
+doc.font("Helvetica");
 
-  doc.text(
-    `${invoice.productName || ""} - ${invoice.issue || ""}\nserial no : ${invoice.serialNo || ""}`,
-    50
-  );
+const total = Number(invoice.amount);
+const gstRate = 0.18;
+const subTotal = total / (1 + gstRate);
+const tax = total - subTotal;
+const qty = 1;
 
-  doc.text(`₹ ${subTotal.toFixed(2)}`, 320, currentY);
-  doc.text(`${qty}`, 400, currentY);
-  doc.text(`₹ ${total.toFixed(2)}`, 460, currentY);
+const description = `${invoice.productName || ""} - ${invoice.issue || ""}
+Serial No: ${invoice.serialNo || ""}`;
 
-  doc.moveDown(2);
+const rowTop = doc.y;
 
-  // =========================
-  // TOTALS
-  // =========================
-  doc.font("Helvetica-Bold");
+// Description (fixed width)
+doc.text(description, itemX, rowTop, {
+  width: 260,
+});
 
-  doc.text(`SubTotal ₹ ${subTotal.toFixed(2)}`, 350);
-  doc.text(`Total Tax (18%) ₹ ${tax.toFixed(2)}`, 350);
-  doc.text(`Total Amount ₹ ${total.toFixed(2)}`, 350);
-  doc.text(`Balance Due ₹ 0.00`, 350);
+// Capture height of description block
+const descriptionHeight = doc.heightOfString(description, {
+  width: 260,
+});
 
-  doc.moveDown(1.5);
+// Right aligned numeric columns
+doc.text(`₹ ${subTotal.toFixed(2)}`, priceX, rowTop, {
+  width: 60,
+  align: "right",
+});
+
+doc.text(`${qty}`, qtyX, rowTop, {
+  width: 40,
+  align: "right",
+});
+
+doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
+  width: 80,
+  align: "right",
+});
+
+// Move Y correctly after tallest column
+doc.y = rowTop + descriptionHeight + 10;
+
+// Bottom line
+doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
+
+doc.moveDown(2);
+
+// =========================
+// TOTALS (RIGHT ALIGNED CLEAN)
+// =========================
+doc.font("Helvetica-Bold");
+
+doc.text(`SubTotal`, 350, doc.y, { continued: true });
+doc.text(`₹ ${subTotal.toFixed(2)}`, { align: "right" });
+
+doc.text(`GST (18%)`, 350, doc.y, { continued: true });
+doc.text(`₹ ${tax.toFixed(2)}`, { align: "right" });
+
+doc.text(`Total Amount`, 350, doc.y, { continued: true });
+doc.text(`₹ ${total.toFixed(2)}`, { align: "right" });
+
+doc.text(`Balance Due`, 350, doc.y, { continued: true });
+doc.text(`₹ 0.00`, { align: "right" });
+
+doc.moveDown(1.5);
+  
 
   // =========================
   // NOTES
