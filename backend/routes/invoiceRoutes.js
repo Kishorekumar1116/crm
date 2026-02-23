@@ -99,33 +99,39 @@ const generatePDFContent = (doc, invoice, flattened) => {
     doc.addPage();
   }
 
-  // TERMS & CONDITIONS
-  doc.moveDown(1);
+  // ==============================
+// TERMS & CONDITIONS (FORCE NEW PAGE)
+// ==============================
 
-  doc.fontSize(12).fillColor("#0d6efd")
-     .text("Terms & Conditions", { underline: true });
+doc.addPage(); // 🔥 Always start terms in new page
 
-  doc.moveDown(0.5);
-  doc.fontSize(9).fillColor("black");
+doc.fontSize(14)
+   .fillColor("#0d6efd")
+   .text("Terms & Conditions", { underline: true });
 
-  const terms = [
-    "1. Payment: Full payment is required upon delivery. No credit period is provided.",
-    "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
-    "3. Diagnostic Charges: Fees apply if quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
-    "4. Warranty Exclusions: Physical damage, power issues, liquid exposure, or accidents are not covered.",
-    "5. Warranty Conditions:",
-    "   a. Warranty covers only parts replaced by us.",
-    "   b. Warranty void for partial repairs or third-party service.",
-    "6. Device Collection: Collect repaired devices within 3 months to avoid handling charges.",
-    "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
-  ];
+doc.moveDown(1);
 
-  terms.forEach(line => {
-    doc.text(line, { width: 500 });
-    doc.moveDown(0.3);
+doc.fontSize(10).fillColor("black");
+
+const terms = [
+  "1. Payment: Full payment is required upon delivery. No credit period is provided.",
+  "2. Returns and Refunds: All sales are final. Goods once sold cannot be returned or refunded.",
+  "3. Diagnostic Charges: Fees apply if quotation is not approved. These fees will be deducted if repair is approved within 30 days.",
+  "4. Warranty Exclusions: Physical damage, power issues, liquid exposure, or accidents are not covered.",
+  "5. Warranty Conditions:",
+  "   a. Warranty covers only parts replaced by us.",
+  "   b. Warranty void for partial repairs or third-party service.",
+  "6. Device Collection: Collect repaired devices within 3 months to avoid handling charges.",
+  "7. Jurisdiction: Disputes subject to Bengaluru jurisdiction only."
+];
+
+terms.forEach(line => {
+  doc.text(line, {
+    width: 500,
+    align: "left"
   });
-
-  doc.moveDown(2);
+  doc.moveDown(0.5);
+});
 
   // FOOTER
   doc.fontSize(10)
