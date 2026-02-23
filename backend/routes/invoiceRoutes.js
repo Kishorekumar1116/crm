@@ -1,4 +1,3 @@
-
 const router = require("express").Router();
 const Invoice = require("../models/Invoice");
 const Customer = require("../models/Customer");
@@ -13,7 +12,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "ipremiumindia@gmail.com",
-    pass: "mxwzukcfjefkucbv", // App password WITHOUT spaces
+    pass: "mxwzukcfjefkucbv",
   },
 });
 
@@ -39,7 +38,6 @@ const generatePDFContent = (doc, invoice, flattened) => {
   const leftX = 50;
   const rightX = 350;
 
-  // FROM (LEFT)
   doc.fontSize(11).font("Helvetica-Bold");
   doc.text("From", leftX, startY);
 
@@ -53,14 +51,8 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   const leftBottomY = doc.y;
 
-  // INVOICE INFO (RIGHT)
   doc.font("Helvetica-Bold");
-  doc.text(
-    `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
-    rightX,
-    startY
-  );
-
+  doc.text(`Invoice # IPI ${invoice.invoiceNumber || invoice._id}`, rightX, startY);
   doc.text(
     `Due Date: ${
       invoice.dueDate
@@ -69,14 +61,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
     }`,
     rightX
   );
-
-  doc.text(
-    `Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`,
-    rightX
-  );
+  doc.text(`Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`, rightX);
 
   const rightBottomY = doc.y;
-
   doc.y = Math.max(leftBottomY, rightBottomY) + 30;
 
   // =========================
@@ -87,7 +74,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
 
   doc.text(flattened.name || "");
   doc.text("Bengaluru, Karnataka");
-  doc.text("India -");
+  doc.text("India");
   doc.text(`Phone: ${flattened.phone || ""}`);
   doc.text(`Email: ${flattened.email || ""}`);
 
@@ -114,14 +101,11 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(1.5);
 
   // =========================
-  // PRODUCT ROW
+  // PRODUCT ROW (NO GST)
   // =========================
   doc.font("Helvetica");
 
   const total = Number(invoice.amount);
-  const gstRate = 0.18;
-  const subTotal = total / (1 + gstRate);
-  const tax = total - subTotal;
   const qty = 1;
 
   const description = `${invoice.productName || ""} - ${invoice.issue || ""}\nSerial No: ${invoice.serialNo || ""}`;
@@ -134,7 +118,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
     width: 260,
   });
 
-  doc.text(`₹ ${subTotal.toFixed(2)}`, priceX, rowTop, {
+  doc.text(`₹ ${total.toFixed(2)}`, priceX, rowTop, {
     width: 60,
     align: "right",
   });
@@ -155,30 +139,13 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.moveDown(2);
 
   // =========================
-  // TOTALS
+  // TOTAL SECTION (ONLY TOTAL)
   // =========================
   doc.font("Helvetica-Bold");
 
   const totalsXLabel = 360;
   const totalsXAmount = 460;
   let totalsY = doc.y;
-  const lineGap = 18;
-
-  doc.text("SubTotal", totalsXLabel, totalsY);
-  doc.text(`₹ ${subTotal.toFixed(2)}`, totalsXAmount, totalsY, {
-    width: 80,
-    align: "right",
-  });
-
-  totalsY += lineGap;
-
-  doc.text("GST (18%)", totalsXLabel, totalsY);
-  doc.text(`₹ ${tax.toFixed(2)}`, totalsXAmount, totalsY, {
-    width: 80,
-    align: "right",
-  });
-
-  totalsY += lineGap;
 
   doc.text("Total Amount", totalsXLabel, totalsY);
   doc.text(`₹ ${total.toFixed(2)}`, totalsXAmount, totalsY, {
@@ -186,7 +153,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
     align: "right",
   });
 
-  totalsY += lineGap;
+  totalsY += 18;
 
   doc.text("Balance Due", totalsXLabel, totalsY);
   doc.text("₹ 0.00", totalsXAmount, totalsY, {
@@ -197,286 +164,91 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.y = totalsY + 25;
 
   // =========================
-// CUSTOMER NOTES
-// =========================
+  // CUSTOMER NOTES
+  // =========================
+  if (invoice.notes) {
+    if (doc.y > 650) {
+      doc.addPage();
+    }
 
-if (invoice.notes) {
+    doc.moveDown(1.5);
 
-  if (doc.y > 650) {
+    const notesWidth = 420;
+    const notesX = (doc.page.width - notesWidth) / 2;
+
+    doc.fontSize(12)
+       .font("Helvetica-Bold")
+       .text("Additional Notes", notesX, doc.y, {
+         width: notesWidth,
+         align: "left"
+       });
+
+    doc.moveDown(0.5);
+
+    doc.fontSize(10)
+       .font("Helvetica")
+       .text(invoice.notes, notesX, doc.y, {
+         width: notesWidth,
+         align: "left",
+         lineGap: 4
+       });
+
+    doc.moveDown(1.5);
+  }
+
+  // =========================
+  // TERMS & CONDITIONS
+  // =========================
+  if (doc.y > 680) {
     doc.addPage();
   }
 
   doc.moveDown(1.5);
 
-  const notesWidth = 420;
-  const notesX = (doc.page.width - notesWidth) / 2;
+  const termsWidth = 420;
+  const centerX = (doc.page.width - termsWidth) / 2;
 
   doc.fontSize(12)
      .font("Helvetica-Bold")
-     .text("Additional Notes", notesX, doc.y, {
-       width: notesWidth,
-       align: "left"
+     .text("TERMS & CONDITIONS", centerX, doc.y, {
+       width: termsWidth,
+       align: "center"
      });
 
-  doc.moveDown(0.5);
+  doc.moveDown(0.8);
 
-  doc.fontSize(10)
-     .font("Helvetica")
-     .text(invoice.notes, notesX, doc.y, {
-       width: notesWidth,
-       align: "left",
-       lineGap: 4
-     });
+  doc.fontSize(9).font("Helvetica");
 
-  doc.moveDown(1.5);
-}
-// =========================
-// TERMS & CONDITIONS (PERFECT CENTER MATCH)
-// =========================
+  doc.moveTo(centerX, doc.y - 5)
+     .lineTo(centerX + termsWidth, doc.y - 5)
+     .stroke();
 
-if (doc.y > 680) {
-  doc.addPage();
-}
-
-doc.moveDown(1.5);
-
-const termsWidth = 420;
-const centerX = (doc.page.width - termsWidth) / 2;
-
-// Header aligned to same centered block
-doc.fontSize(12)
-   .font("Helvetica-Bold")
-   .text("TERMS & CONDITIONS", centerX, doc.y, {
-     width: termsWidth,
-     align: "center"
-   });
-
-doc.moveDown(0.8);
-
-doc.fontSize(9).font("Helvetica");
-
-// Divider line aligned with block
-doc.moveTo(centerX, doc.y - 5)
-   .lineTo(centerX + termsWidth, doc.y - 5)
-   .stroke();
-
-// Terms Content
-const termsText = `
+  const termsText = `
 1. Full payment is required upon delivery of the repaired device.
-
-2. All sales are final. No refunds will be issued after service completion.
-
-3. Diagnostic charges are applicable if the repair quotation is not approved.
-
-4. Warranty does not cover physical damage, water damage, or tampering.
-
-5. Warranty is applicable only to replaced parts and not the entire device.
-
-6. Devices must be collected within 90 days from completion date.
-
-7. Any disputes are subject to Bengaluru, Karnataka jurisdiction only.
+2. All sales are final. No refunds will be issued.
+3. Warranty does not cover physical or water damage.
+4. Devices must be collected within 90 days.
+5. Jurisdiction: Bengaluru, Karnataka.
 `;
 
-doc.text(termsText.trim(), centerX, doc.y, {
-  width: termsWidth,
-  align: "left",
-  lineGap: 4
-});
+  doc.text(termsText.trim(), centerX, doc.y, {
+    width: termsWidth,
+    align: "left",
+    lineGap: 4
+  });
 
-doc.moveDown(2);
+  doc.moveDown(2);
+
   // =========================
   // FOOTER
   // =========================
   doc.fontSize(10)
-    .font("Helvetica-Oblique")
-    .text("Thank you for your business!", {
-      align: "center",
-    });
+     .font("Helvetica-Oblique")
+     .text("Thank you for your business!", {
+       align: "center",
+     });
 
   doc.end();
 };
-
-// ==============================
-// 1. CREATE INVOICE
-// ==============================
-router.post("/", async (req, res) => {
-  try {
-    const { customerId, amount, notes, status, dueDate } = req.body;
-
-    if (!customerId || !amount) {
-      return res.status(400).json({ message: "Data missing" });
-    }
-
-    // 🔥 Fetch customer details
-    const customer = await Customer.findById(customerId);
-
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
-    }
-
-    // 🔥 Create invoice WITH product snapshot
-    const invoice = await Invoice.create({
-      customerId,
-      amount,
-      notes,
-      status,
-      dueDate,
-
-      // 👇 Product snapshot stored permanently
-      productName: customer.productName,
-      brand: customer.brand,
-      model: customer.model,
-      serialNo: customer.serialNo,
-      issue: customer.issue,
-    });
-
-    await invoice.populate("customerId");
-
-    const flattened = {
-      ...invoice.toObject(),
-      name: customer.name,
-      phone: customer.phone,
-      email: customer.email,
-    };
-
-    // ==============================
-    // AUTO EMAIL (UNCHANGED)
-    // ==============================
-    if (customer.email) {
-      const doc = new PDFDocument({ size: "A4", margin: 50 });
-      const bufferStream = new streamBuffers.WritableStreamBuffer();
-
-      doc.pipe(bufferStream);
-      generatePDFContent(doc, invoice, flattened);
-
-      bufferStream.on("finish", async () => {
-        try {
-          const pdfBuffer = bufferStream.getContents();
-
-          await transporter.sendMail({
-            from: '"iPremium Care" <ipremiumindia@gmail.com>',
-            to: customer.email,
-            subject: `Invoice Created: ${invoice.invoiceNumber || invoice._id}`,
-            text: "Hi, please find your attached invoice.",
-            attachments: [
-              { filename: "Invoice.pdf", content: pdfBuffer },
-            ],
-          });
-
-        } catch (err) {
-          console.error("Mail Error:", err.message);
-        }
-      });
-    }
-
-    res.status(201).json(flattened);
-
-  } catch (error) {
-    console.error("CREATE INVOICE ERROR:", error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// ==============================
-// 2. VIEW PDF
-// ==============================
-router.get("/view-pdf/:id", async (req, res) => {
-  try {
-    const invoice = await Invoice.findById(req.params.id).populate("customerId");
-    if (!invoice) return res.status(404).send("Not found");
-
-    const flattened = { ...invoice.toObject(), ...invoice.customerId._doc };
-
-    const doc = new PDFDocument({ size: "A4", margin: 50 });
-
-    res.setHeader("Content-Type", "application/pdf");
-    doc.pipe(res);
-
-    generatePDFContent(doc, invoice, flattened);
-
-  } catch (error) {
-    res.status(500).send("PDF Error");
-  }
-});
-
-// ==============================
-// 3. SEND EMAIL
-// ==============================
-router.post("/send-email/:id", async (req, res) => {
-  try {
-    const invoice = await Invoice.findById(req.params.id).populate("customerId");
-
-    if (!invoice || !invoice.customerId.email) {
-      return res.status(404).json({ message: "Customer email not found" });
-    }
-
-    const flattened = { ...invoice.toObject(), ...invoice.customerId._doc };
-
-    const doc = new PDFDocument({ size: "A4", margin: 50 });
-    const bufferStream = new streamBuffers.WritableStreamBuffer();
-
-    doc.pipe(bufferStream);
-    generatePDFContent(doc, invoice, flattened);
-
-    bufferStream.on("finish", async () => {
-      try {
-        const pdfBuffer = bufferStream.getContents();
-
-        await transporter.sendMail({
-          from: '"iPremium Care" <ipremiumindia@gmail.com>',
-          to: invoice.customerId.email,
-          subject: `Invoice: ${invoice.invoiceNumber || invoice._id}`,
-          text: "Hi, please find your attached invoice.",
-          attachments: [
-            { filename: "Invoice.pdf", content: pdfBuffer },
-          ],
-        });
-
-        res.status(200).json({ message: "Email sent successfully" });
-
-      } catch (mailErr) {
-        res.status(500).json({ error: mailErr.message });
-      }
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// ==============================
-// 4. GET ALL
-// ==============================
-router.get("/", async (req, res) => {
-  try {
-    const invoices = await Invoice.find()
-      .populate("customerId")
-      .sort({ createdAt: -1 });
-
-    const flattened = invoices.map(inv => ({
-      ...inv.toObject(),
-      name: inv.customerId?.name,
-      phone: inv.customerId?.phone,
-      email: inv.customerId?.email,
-    }));
-
-    res.json(flattened);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// ==============================
-// DELETE
-// ==============================
-router.delete("/:id", async (req, res) => {
-  try {
-    await Invoice.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 module.exports = router;
