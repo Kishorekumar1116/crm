@@ -106,29 +106,42 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Data missing" });
     }
 
+    // 🔥 Fetch customer details
+    const customer = await Customer.findById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    // 🔥 Create invoice WITH product snapshot
     const invoice = await Invoice.create({
       customerId,
       amount,
       notes,
       status,
       dueDate,
+
+      // 👇 Product snapshot stored permanently
+      productName: customer.productName,
+      brand: customer.brand,
+      model: customer.model,
+      serialNo: customer.serialNo,
+      issue: customer.issue,
     });
 
     await invoice.populate("customerId");
 
-    if (!invoice.customerId) {
-      return res.status(400).json({ message: "Customer not found" });
-    }
-
     const flattened = {
       ...invoice.toObject(),
-      name: invoice.customerId.name,
-      phone: invoice.customerId.phone,
-      email: invoice.customerId.email,
+      name: customer.name,
+      phone: customer.phone,
+      email: customer.email,
     };
 
-    // AUTO EMAIL
-    if (invoice.customerId.email) {
+    // ==============================
+    // AUTO EMAIL (UNCHANGED)
+    // ==============================
+    if (customer.email) {
       const doc = new PDFDocument({ size: "A4", margin: 50 });
       const bufferStream = new streamBuffers.WritableStreamBuffer();
 
@@ -141,7 +154,7 @@ router.post("/", async (req, res) => {
 
           await transporter.sendMail({
             from: '"iPremium Care" <ipremiumindia@gmail.com>',
-            to: invoice.customerId.email,
+            to: customer.email,
             subject: `Invoice Created: ${invoice.invoiceNumber || invoice._id}`,
             text: "Hi, please find your attached invoice.",
             attachments: [
