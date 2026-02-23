@@ -252,18 +252,7 @@ doc.text(termsText.trim(), centerX, doc.y, {
   lineGap: 2
 });
 
-doc.moveDown(2);
-  // =========================
-  // FOOTER
-  // =========================
-  doc.fontSize(10)
-    .font("Helvetica-Oblique")
-    .text("Thank you for your business!", {
-      align: "center",
-    });
 
-  doc.end();
-};
 
 // ==============================
 // 1. CREATE INVOICE
