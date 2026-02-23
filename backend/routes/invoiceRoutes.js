@@ -195,12 +195,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
   });
 
   doc.y = totalsY + 25;
-
-  // =========================
-  // TERMS & CONDITIONS (SAME PAGE)
-  // =========================
+  
 // =========================
-// TERMS & CONDITIONS (FULL CENTER ALIGN)
+// TERMS & CONDITIONS (PERFECT CENTER MATCH)
 // =========================
 
 if (doc.y > 680) {
@@ -209,10 +206,14 @@ if (doc.y > 680) {
 
 doc.moveDown(1.5);
 
-// Center Title
+const termsWidth = 420;
+const centerX = (doc.page.width - termsWidth) / 2;
+
+// Header aligned to same centered block
 doc.fontSize(12)
    .font("Helvetica-Bold")
-   .text("TERMS & CONDITIONS", {
+   .text("TERMS & CONDITIONS", centerX, doc.y, {
+     width: termsWidth,
      align: "center"
    });
 
@@ -220,23 +221,32 @@ doc.moveDown(0.8);
 
 doc.fontSize(9).font("Helvetica");
 
-// Center each line properly
-const terms = [
-  "1. Full payment is required upon delivery of the repaired device.",
-  "2. All sales are final. No refunds after service completion.",
-  "3. Diagnostic charges apply if repair is not approved.",
-  "4. Warranty does not cover physical or liquid damage.",
-  "5. Warranty applies only to replaced parts.",
-  "6. Devices must be collected within 90 days.",
-  "7. Jurisdiction: Bengaluru, Karnataka."
-];
+// Divider line aligned with block
+doc.moveTo(centerX, doc.y - 5)
+   .lineTo(centerX + termsWidth, doc.y - 5)
+   .stroke();
 
-terms.forEach(line => {
-  doc.text(line, {
-    align: "center",
-    width: 450
-  });
-  doc.moveDown(0.5);
+// Terms Content
+const termsText = `
+1. Full payment is required upon delivery of the repaired device.
+
+2. All sales are final. No refunds will be issued after service completion.
+
+3. Diagnostic charges are applicable if the repair quotation is not approved.
+
+4. Warranty does not cover physical damage, water damage, or tampering.
+
+5. Warranty is applicable only to replaced parts and not the entire device.
+
+6. Devices must be collected within 90 days from completion date.
+
+7. Any disputes are subject to Bengaluru, Karnataka jurisdiction only.
+`;
+
+doc.text(termsText.trim(), centerX, doc.y, {
+  width: termsWidth,
+  align: "left",
+  lineGap: 4
 });
 
 doc.moveDown(2);
