@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 function Invoice() {
   const [customers, setCustomers] = useState([]);
   const [selected, setSelected] = useState("");
-  const [amount, setAmount] = useState("");
+  const [includeGST, setIncludeGST] = useState(false);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -24,6 +24,15 @@ const [currentItem, setCurrentItem] = useState({
   const queryParams = new URLSearchParams(location.search);
   const prefillCustomerId = queryParams.get("customerId") || "";
 
+
+  const subtotal = serviceItems.reduce(
+  (sum, item) => sum + Number(item.amount || 0),
+  0
+);
+
+const gstAmount = includeGST ? subtotal * 0.18 : 0;
+
+const finalAmount = subtotal + gstAmount;
   // Fetch all customers
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -54,16 +63,23 @@ const [currentItem, setCurrentItem] = useState({
   // CREATE INVOICE FUNCTION
   // --------------------------
   const createInvoice = async () => {
-    if (!selected || !amount) {
-      setError("Please select a customer and enter the amount.");
-      return;
-    }
+    if (!selected) {
+  setError("Please select a customer.");
+  return;
+}
+
+if (serviceItems.length === 0) {
+  setError("Please add at least one service item.");
+  return;
+}
 
     try {
       // 1. Send data to backend
       const res = await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
   customerId: selected,
-  amount: Number(amount),
+ amount: finalAmount,
+includeGST,
+gstAmount,
   notes,
   serviceItems   
 });
@@ -72,7 +88,7 @@ const [currentItem, setCurrentItem] = useState({
       setError("");
       
       // 2. Clear inputs
-      setAmount("");
+      
       setNotes("");
 
       // 3. Wait 2 seconds so user sees the success message, then redirect
@@ -250,7 +266,6 @@ const [currentItem, setCurrentItem] = useState({
     onClick={() => {
       if (!currentItem.productName) return;
       setServiceItems([...serviceItems, currentItem]);
-      console.log(ServiceItems)
     setCurrentItem({
   productName: "",
   model: "",
@@ -275,12 +290,48 @@ const [currentItem, setCurrentItem] = useState({
     <label className="d-block small fw-bold text-muted mb-2">
       INVOICE AMOUNT
     </label>
+  <div className="text-end mt-4">
+
+  {/* Subtotal */}
+  <div className="mb-2">
+    <small className="text-muted">Subtotal:</small>
+    <h6>₹ {subtotal.toFixed(2)}</h6>
+  </div>
+
+  {/* GST Checkbox */}
+  <div className="form-check d-flex justify-content-end mb-2">
+    <input
+      className="form-check-input me-2"
+      type="checkbox"
+      checked={includeGST}
+      onChange={() => setIncludeGST(!includeGST)}
+      id="gstCheck"
+    />
+    <label className="form-check-label" htmlFor="gstCheck">
+      Add 18% GST
+    </label>
+  </div>
+
+  {/* GST Amount */}
+  {includeGST && (
+    <div className="mb-2">
+      <small className="text-muted">GST (18%):</small>
+      <h6>₹ {gstAmount.toFixed(2)}</h6>
+    </div>
+  )}
+
+  {/* Final Amount */}
+  <div className="mt-3">
+    <label className="fw-bold">TOTAL AMOUNT</label>
     <input
       type="number"
-      className="form-control form-control-lg text-end"
-      value={amount}
-      onChange={(e) => setAmount(e.target.value)}
+      className="form-control form-control-lg text-end fw-bold"
+      value={finalAmount.toFixed(2)}
+      readOnly
     />
+  </div>
+
+</div>
   </div>
 
 </div>
