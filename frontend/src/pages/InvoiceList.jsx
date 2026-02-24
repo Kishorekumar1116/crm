@@ -41,7 +41,30 @@ function InvoiceList() {
     alert("❌ Failed to send email. See console for details.");
     }
   };
+//new
+   const deleteInvoice = async (invoiceId) => {
+    try {
+      const confirmDelete = window.confirm("Are you sure?");
+      if (!confirmDelete) return;
 
+      await axios.delete(
+        `https://ipremium-crm.onrender.com/api/invoices/${invoiceId}`
+      );
+
+      alert("Deleted successfully");
+      fetchInvoices();
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ✅ ADD HERE
+  const editInvoice = (invoiceId) => {
+    navigate(`/invoice/edit/${invoiceId}`);
+  };
+
+  
   const filteredInvoices = invoices.filter((inv) => {
     const name = inv.customerId?.name?.toLowerCase() || inv.name?.toLowerCase() || "";
     const phone = inv.customerId?.phone || inv.phone || "";
