@@ -7,6 +7,7 @@ import Customers from "./pages/Customers";
 import Invoice from "./pages/Invoice";
 import Quotation from "./pages/Quotation";
 import InvoiceList from "./pages/InvoiceList";
+import QuotationList from "./pages/QuotationList";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/invoice" element={<Invoice />} />
         <Route path="/quotation" element={<Quotation />} />
         <Route path="/all-invoices" element={<InvoiceList />} />
+        <Route path="/quotation-list" element={<QuotationList />} />
       </Routes>
     </BrowserRouter>
   );
