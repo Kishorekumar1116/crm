@@ -15,7 +15,8 @@ const [currentItem, setCurrentItem] = useState({
   productName: "",
   model: "",
   serialNo: "",
-  issue: ""
+  issue: "",
+  amount:""
 });
   
   const navigate = useNavigate(); // Hook for redirection
@@ -234,7 +235,7 @@ const [currentItem, setCurrentItem] = useState({
       <input
         type="number"
         className="form-control"
-        placeholder="Issue"
+        placeholder="Amount"
         value={currentItem.issue}
         onChange={(e) =>
           setCurrentItem({ ...currentItem, issue: e.target.value })
