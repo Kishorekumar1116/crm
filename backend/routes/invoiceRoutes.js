@@ -86,16 +86,15 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   const tableTop = doc.y;
   const itemX = 50;
-  const priceX = 330;
-  const qtyX = 410;
-  const amountX = 470;
+  const priceX = 360;
+const amountX = 460;
 
   doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
 
   doc.font("Helvetica-Bold");
   doc.text("Description", itemX, tableTop);
   doc.text("Price", priceX, tableTop, { width: 60, align: "right" });
-  doc.text("Qty", qtyX, tableTop, { width: 40, align: "right" });
+  
   doc.text("Amount", amountX, tableTop, { width: 80, align: "right" });
 
   doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
@@ -107,7 +106,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.font("Helvetica");
 
   const total = Number(invoice.amount);
-  const qty = 1;
+ 
 
   const description = `${invoice.productName || ""} - ${invoice.issue || ""}\nSerial No: ${invoice.serialNo || ""}`;
 
@@ -124,10 +123,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
     align: "right",
   });
 
-  doc.text(`${qty}`, qtyX, rowTop, {
-    width: 40,
-    align: "right",
-  });
+ 
 
   doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
     width: 80,
