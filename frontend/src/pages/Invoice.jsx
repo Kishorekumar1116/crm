@@ -230,6 +230,17 @@ const [currentItem, setCurrentItem] = useState({
         }
       />
     </div>
+        <div className="col-md-3">
+      <input
+        type="number"
+        className="form-control"
+        placeholder="Issue"
+        value={currentItem.issue}
+        onChange={(e) =>
+          setCurrentItem({ ...currentItem, issue: e.target.value })
+        }
+      />
+    </div>
   </div>
 
   {/* Add Button */}
