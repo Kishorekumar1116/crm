@@ -231,17 +231,17 @@ const [currentItem, setCurrentItem] = useState({
         }
       />
     </div>
-        <div className="col-md-3">
-      <input
-        type="number"
-        className="form-control"
-        placeholder="Amount"
-        value={currentItem.issue}
-        onChange={(e) =>
-          setCurrentItem({ ...currentItem, issue: e.target.value })
-        }
-      />
-    </div>
+     <div className="col-md-3">
+  <input
+    type="number"
+    className="form-control"
+    placeholder="Amount"
+    value={currentItem.amount}
+    onChange={(e) =>
+      setCurrentItem({ ...currentItem, amount: e.target.value })
+    }
+  />
+</div>
   </div>
 
   {/* Add Button */}
@@ -250,12 +250,13 @@ const [currentItem, setCurrentItem] = useState({
     onClick={() => {
       if (!currentItem.productName) return;
       setServiceItems([...serviceItems, currentItem]);
-      setCurrentItem({
-        productName: "",
-        model: "",
-        serialNo: "",
-        issue: ""
-      });
+    setCurrentItem({
+  productName: "",
+  model: "",
+  serialNo: "",
+  issue: "",
+  amount: ""
+});
     }}
   >
     + Add Service
