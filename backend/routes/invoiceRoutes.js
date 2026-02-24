@@ -258,8 +258,29 @@ doc.end();
 
 
 // ==============================
-// 1. CREATE INVOICE
+// AUTO INVOICE NUMBER GENERATION
 // ==============================
+
+const year = new Date().getFullYear();
+
+// Find last invoice of this year
+const lastInvoice = await Invoice.findOne({
+  invoiceNumber: { $regex: `INV-${year}` }
+}).sort({ createdAt: -1 });
+
+let nextNumber = 1;
+
+if (lastInvoice && lastInvoice.invoiceNumber) {
+  const lastNumber = parseInt(
+    lastInvoice.invoiceNumber.split("-")[2]
+  );
+  nextNumber = lastNumber + 1;
+}
+
+const formattedNumber = String(nextNumber).padStart(2, "0");
+
+const invoiceNumber = `INV-${year}-${formattedNumber}`;
+
 router.post("/", async (req, res) => {
   try {
     const { customerId, amount, notes, status, dueDate } = req.body;
@@ -268,22 +289,37 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Data missing" });
     }
 
-    // 🔥 Fetch customer details
     const customer = await Customer.findById(customerId);
-
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
     }
 
-    // 🔥 Create invoice WITH product snapshot
+    // AUTO INVOICE NUMBER
+    const year = new Date().getFullYear();
+
+    const lastInvoice = await Invoice.findOne({
+      invoiceNumber: { $regex: `INV-${year}` }
+    }).sort({ createdAt: -1 });
+
+    let nextNumber = 1;
+
+    if (lastInvoice && lastInvoice.invoiceNumber) {
+      const lastNumber = parseInt(
+        lastInvoice.invoiceNumber.split("-")[2]
+      );
+      nextNumber = lastNumber + 1;
+    }
+
+    const formattedNumber = String(nextNumber).padStart(2, "0");
+    const invoiceNumber = `INV-${year}-${formattedNumber}`;
+
     const invoice = await Invoice.create({
       customerId,
       amount,
       notes,
       status,
       dueDate,
-
-      // 👇 Product snapshot stored permanently
+      invoiceNumber,
       productName: customer.productName,
       brand: customer.brand,
       model: customer.model,
@@ -301,7 +337,7 @@ router.post("/", async (req, res) => {
     };
 
     // ==============================
-    // AUTO EMAIL (UNCHANGED)
+    // AUTO EMAIL (INSIDE TRY BLOCK)
     // ==============================
     if (customer.email) {
       const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -317,7 +353,7 @@ router.post("/", async (req, res) => {
           await transporter.sendMail({
             from: '"iPremium Care" <ipremiumindia@gmail.com>',
             to: customer.email,
-            subject: `Invoice Created: ${invoice.invoiceNumber || invoice._id}`,
+            subject: `Invoice Created: ${invoice.invoiceNumber}`,
             text: "Hi, please find your attached invoice.",
             attachments: [
               { filename: "Invoice.pdf", content: pdfBuffer },
