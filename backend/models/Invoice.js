@@ -12,6 +12,10 @@ const invoiceSchema = new mongoose.Schema({
   model: String,
   serialNo: String,
   issue: String,
+  invoiceNumber: {
+  type: String,
+  unique: true,
+}
 
   // Payment & status
   status: { type: String, enum: ["Unpaid", "Partial", "Paid"], default: "Unpaid" },
