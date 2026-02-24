@@ -270,13 +270,7 @@ India - 560102</p>
   </div>
 
 </div>
-                  ) : (
-                    <p className="text-center text-muted my-3">
-                      Please select a customer to see job data.
-                    </p>
-                  )}
-                </div>
-              </div>
+                  
 
               {/* Notes */}
               <div className="mb-4">
