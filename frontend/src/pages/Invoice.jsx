@@ -10,7 +10,14 @@ function Invoice() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [customerData, setCustomerData] = useState({});
-
+const [serviceItems, setServiceItems] = useState([]);
+const [currentItem, setCurrentItem] = useState({
+  productName: "",
+  model: "",
+  serialNo: "",
+  issue: ""
+});
+  
   const navigate = useNavigate(); // Hook for redirection
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -169,46 +176,99 @@ India - 560102</p>
                 <div className="bg-dark text-white p-3 fw-bold">
                   Service & Job Details
                 </div>
-                <div className="p-4">
-                  {customerData?.productName ? (
-                    <div className="row align-items-center">
-                      <div className="col-md-8">
-                        <h6 className="fw-bold text-primary">
-                          {customerData.productName}
-                        </h6>
-                        <div className="d-flex gap-2 mb-3">
-                          <span className="badge bg-light text-dark border">
-                            Model: {customerData.model || "-"}
-                          </span>
-                          <span className="badge bg-light text-dark border">
-                            SN: {customerData.serialNo || "-"}
-                          </span>
-                        </div>
-                        <div className="p-3 bg-warning bg-opacity-10 border-start border-warning border-4 rounded">
-                          <strong className="small text-uppercase text-warning d-block">
-                            Reported Issue:
-                          </strong>
-                          <span>{customerData.issue || "No issue recorded"}</span>
-                        </div>
-                      </div>
-                      <div className="col-md-4 text-end">
-                        <label className="d-block small fw-bold text-muted mb-2">
-                          INVOICE AMOUNT
-                        </label>
-                        <div className="input-group">
-                          <span className="input-group-text bg-white border-0 shadow-sm">
-                            ₹
-                          </span>
-                          <input
-                            type="number"
-                            className="form-control form-control-lg border-0 shadow-sm bg-light fw-bold text-end"
-                            placeholder="0.00"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
+<div className="p-4">
+
+  {/* Input Fields */}
+  <div className="row g-3 mb-3">
+    <div className="col-md-3">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Product Name"
+        value={currentItem.productName}
+        onChange={(e) =>
+          setCurrentItem({ ...currentItem, productName: e.target.value })
+        }
+      />
+    </div>
+
+    <div className="col-md-3">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Model"
+        value={currentItem.model}
+        onChange={(e) =>
+          setCurrentItem({ ...currentItem, model: e.target.value })
+        }
+      />
+    </div>
+
+    <div className="col-md-3">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Serial No"
+        value={currentItem.serialNo}
+        onChange={(e) =>
+          setCurrentItem({ ...currentItem, serialNo: e.target.value })
+        }
+      />
+    </div>
+
+    <div className="col-md-3">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Issue"
+        value={currentItem.issue}
+        onChange={(e) =>
+          setCurrentItem({ ...currentItem, issue: e.target.value })
+        }
+      />
+    </div>
+  </div>
+
+  {/* Add Button */}
+  <button
+    className="btn btn-sm btn-success mb-3"
+    onClick={() => {
+      if (!currentItem.productName) return;
+      setServiceItems([...serviceItems, currentItem]);
+      setCurrentItem({
+        productName: "",
+        model: "",
+        serialNo: "",
+        issue: ""
+      });
+    }}
+  >
+    + Add Service
+  </button>
+
+  {/* Display Added Items */}
+  {serviceItems.map((item, index) => (
+    <div key={index} className="border p-3 rounded mb-2 bg-light">
+      <strong>{item.productName}</strong> | {item.model} | {item.serialNo}
+      <br />
+      Issue: {item.issue}
+    </div>
+  ))}
+
+  {/* Amount Section */}
+  <div className="text-end mt-3">
+    <label className="d-block small fw-bold text-muted mb-2">
+      INVOICE AMOUNT
+    </label>
+    <input
+      type="number"
+      className="form-control form-control-lg text-end"
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+    />
+  </div>
+
+</div>
                   ) : (
                     <p className="text-center text-muted my-3">
                       Please select a customer to see job data.
