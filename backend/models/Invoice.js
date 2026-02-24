@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
 
 const invoiceSchema = new mongoose.Schema({
-  customerId: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
+  customerId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Customer", 
+    required: true 
+  },
 
   // Invoice details
-  invoiceNumber: { type: String, unique: true }, // Auto-generate
+  invoiceNumber: { type: String, unique: true },
   amount: { type: Number, required: true },
   notes: { type: String },
   productName: String,
@@ -12,25 +16,17 @@ const invoiceSchema = new mongoose.Schema({
   model: String,
   serialNo: String,
   issue: String,
-  invoiceNumber: {
-  type: String,
-  unique: true,
-}
 
   // Payment & status
-  status: { type: String, enum: ["Unpaid", "Partial", "Paid"], default: "Unpaid" },
+  status: { 
+    type: String, 
+    enum: ["Unpaid", "Partial", "Paid"], 
+    default: "Unpaid" 
+  },
 
   // Dates
-  createdAt: { type: Date, default: Date.now },
   dueDate: Date
-}, { timestamps: true });
 
-// Auto-generate invoice number before saving
-invoiceSchema.pre("save", async function () {
-  if (!this.invoiceNumber) {
-    const count = await mongoose.model("Invoice").countDocuments();
-    this.invoiceNumber = `INV-2026-${count + 1}`;
-  }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Invoice", invoiceSchema);
