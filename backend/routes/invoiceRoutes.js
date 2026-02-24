@@ -440,7 +440,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    await Invoice.findByIdAndUpdate(req.params.id, req.body);
+    await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json({ message: "Invoice updated successfully" });
   } catch (err) {
     res.status(500).json({ message: "Update failed" });
