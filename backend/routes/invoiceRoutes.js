@@ -101,17 +101,28 @@ doc.text(
   doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
   doc.moveDown(1.5);
 
-  // =========================
-  // PRODUCT ROW (NO GST / NO SUBTOTAL)
-  // =========================
-  doc.font("Helvetica");
 
-  const total = Number(invoice.amount);
-  const qty = 1;
+ // =========================
+// MULTIPLE SERVICE ITEMS
+// =========================
 
-  const description = `${invoice.productName || ""} - ${invoice.issue || ""}\nSerial No: ${invoice.serialNo || ""}`;
+doc.font("Helvetica");
+
+let grandTotal = 0;
+
+invoice.serviceItems.forEach((item, index) => {
 
   const rowTop = doc.y;
+
+  const price = Number(item.amount);
+  const qty = 1;
+  const amount = price * qty;
+
+  grandTotal += amount;
+
+  const description =
+    `${item.productName || ""} - ${item.issue || ""}\n` +
+    `Model: ${item.model || ""} | Serial: ${item.serialNo || ""}`;
 
   doc.text(description, itemX, rowTop, { width: 260 });
 
@@ -119,55 +130,71 @@ doc.text(
     width: 260,
   });
 
-doc.text(`${total.toFixed(2)}`, priceX, rowTop, {
-  width: 60,
-  align: "right",
-});
-  
+  doc.text(price.toFixed(2), priceX, rowTop, {
+    width: 60,
+    align: "right",
+  });
+
   doc.text(`${qty}`, qtyX, rowTop, {
     width: 40,
     align: "right",
   });
 
-  doc.text(`${total.toFixed(2)}`, amountX, rowTop, {
-  width: 80,
-  align: "right",
-});
+  doc.text(amount.toFixed(2), amountX, rowTop, {
+    width: 80,
+    align: "right",
+  });
 
   doc.y = rowTop + descriptionHeight + 10;
 
   doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown(2);
+  doc.moveDown(1);
+});
 
   // =========================
   // TOTALS (ONLY TOTAL)
   // =========================
-  doc.font("Helvetica-Bold");
+doc.font("Helvetica-Bold");
 
-  const totalsXLabel = 360;
-  const totalsXAmount = 460;
-  let totalsY = doc.y;
-  const lineGap = 18;
+let totalsY = doc.y;
+const lineGap = 18;
 
-  doc.text("Total Amount", totalsXLabel, totalsY);
-  doc.text(`${total.toFixed(2)}`, totalsXAmount, totalsY, {
+const subtotal = Number(invoice.subtotal || grandTotal);
+const gst = Number(invoice.gst || 0);
+const finalTotal = Number(invoice.amount || subtotal);
+
+// Subtotal
+doc.text("Subtotal", totalsXLabel, totalsY);
+doc.text(subtotal.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
   align: "right",
 });
+totalsY += lineGap;
 
+// GST (if enabled)
+if (invoice.includeGST) {
+  doc.text("GST (18%)", totalsXLabel, totalsY);
+  doc.text(gst.toFixed(2), totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
   totalsY += lineGap;
+}
 
-  doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text("0.00", totalsXAmount, totalsY, {
+// Final Total
+doc.text("Total Amount", totalsXLabel, totalsY);
+doc.text(finalTotal.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
   align: "right",
 });
+totalsY += lineGap;
 
-  doc.y = totalsY + 25;
-
-  // =========================
-  // NOTES & TERMS (UNCHANGED BELOW)
-  // =========================
+// Balance
+doc.text("Balance Due", totalsXLabel, totalsY);
+doc.text("0.00", totalsXAmount, totalsY, {
+  width: 80,
+  align: "right",
+});
 
   // =========================
 // CUSTOMER NOTES
@@ -261,7 +288,17 @@ doc.end();
 
 router.post("/", async (req, res) => {
   try {
-    const { customerId, amount, notes, status, dueDate } = req.body;
+   const {
+  customerId,
+  serviceItems,
+  subtotal,
+  gst,
+  includeGST,
+  amount,
+  notes,
+  status,
+  dueDate
+} = req.body;
 
     if (!customerId || !amount) {
       return res.status(400).json({ message: "Data missing" });
@@ -292,18 +329,17 @@ router.post("/", async (req, res) => {
     const invoiceNumber = `INV-${year}-${formattedNumber}`;
 
     const invoice = await Invoice.create({
-      customerId,
-      amount,
-      notes,
-      status,
-      dueDate,
-      invoiceNumber,
-      productName: customer.productName,
-      brand: customer.brand,
-      model: customer.model,
-      serialNo: customer.serialNo,
-      issue: customer.issue,
-    });
+  customerId,
+  serviceItems,
+  subtotal,
+  gst,
+  includeGST,
+  amount,
+  notes,
+  status,
+  dueDate,
+  invoiceNumber,
+});
 
     await invoice.populate("customerId");
 
