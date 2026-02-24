@@ -58,10 +58,10 @@ const generatePDFContent = (doc, invoice, flattened) => {
     startY
   );
 
-  doc.text(
-    `Total Amount: ₹ ${Number(invoice.amount).toFixed(2)}`,
-    rightX
-  );
+doc.text(
+  `Total Amount: ${Number(invoice.amount).toFixed(2)}`,
+  rightX
+);
 
   const rightBottomY = doc.y;
 
@@ -119,20 +119,20 @@ const generatePDFContent = (doc, invoice, flattened) => {
     width: 260,
   });
 
-  doc.text(`₹ ${total.toFixed(2)}`, priceX, rowTop, {
-    width: 60,
-    align: "right",
-  });
-
+doc.text(`${total.toFixed(2)}`, priceX, rowTop, {
+  width: 60,
+  align: "right",
+});
+  
   doc.text(`${qty}`, qtyX, rowTop, {
     width: 40,
     align: "right",
   });
 
-  doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
-    width: 80,
-    align: "right",
-  });
+  doc.text(`${total.toFixed(2)}`, amountX, rowTop, {
+  width: 80,
+  align: "right",
+});
 
   doc.y = rowTop + descriptionHeight + 10;
 
@@ -150,18 +150,18 @@ const generatePDFContent = (doc, invoice, flattened) => {
   const lineGap = 18;
 
   doc.text("Total Amount", totalsXLabel, totalsY);
-  doc.text(`₹ ${total.toFixed(2)}`, totalsXAmount, totalsY, {
-    width: 80,
-    align: "right",
-  });
+  doc.text(`${total.toFixed(2)}`, totalsXAmount, totalsY, {
+  width: 80,
+  align: "right",
+});
 
   totalsY += lineGap;
 
   doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text("₹ 0.00", totalsXAmount, totalsY, {
-    width: 80,
-    align: "right",
-  });
+  doc.text("0.00", totalsXAmount, totalsY, {
+  width: 80,
+  align: "right",
+});
 
   doc.y = totalsY + 25;
 
