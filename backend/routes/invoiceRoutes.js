@@ -176,10 +176,7 @@ totalsY += lineGap;
 // GST (if enabled)
 if (invoice.includeGST) {
   doc.text("GST (18%)", totalsXLabel, totalsY);
-  doc.text(gst.toFixed(2), totalsXAmount, totalsY, {
-    width: 80,
-    align: "right",
-  });
+ 
   totalsY += lineGap;
 }
 
