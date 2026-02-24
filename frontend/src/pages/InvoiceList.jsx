@@ -127,10 +127,8 @@ function InvoiceList() {
                 <th>Customer Name</th>
                 <th>Phone</th>
                 <th>Amount</th>
-                <th>Product</th>
-<th>Model</th>
-<th>Serial No</th>
-<th>Issue</th>
+                <th>Service Details</th>
+                <th>GST</th>
                 <th>Notes</th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -155,10 +153,25 @@ function InvoiceList() {
                     <td className="fw-bold">{inv.customerId?.name || inv.name || "N/A"}</td>
                     <td>{inv.customerId?.phone || inv.phone || "N/A"}</td>
                     <td className="text-success fw-bold">₹{inv.amount}</td>
-                    <td>{inv.productName || "-"}</td>
-                    <td>{inv.model || "-"}</td>
-                    <td>{inv.serialNo || "-"}</td>
-                    <td>{inv.issue || "-"}</td>
+                    <td>
+  {inv.serviceItems && inv.serviceItems.length > 0 ? (
+    inv.serviceItems.map((item, index) => (
+      <div key={index} style={{ fontSize: "13px", marginBottom: "5px" }}>
+        <strong>{item.productName}</strong> | {item.model} | {item.serialNo}  
+        <br />
+        Issue: {item.issue}  
+        <br />
+        ₹ {item.amount}
+        <hr style={{ margin: "5px 0" }} />
+      </div>
+    ))
+  ) : (
+    "-"
+  )}
+</td>
+<td>
+  {inv.includeGST ? `₹ ${inv.gst}` : "No GST"}
+</td>
                     <td>{inv.notes || "-"}</td>
                     <td className="text-center">
                       <button 
