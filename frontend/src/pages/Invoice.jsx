@@ -250,6 +250,7 @@ const [currentItem, setCurrentItem] = useState({
     onClick={() => {
       if (!currentItem.productName) return;
       setServiceItems([...serviceItems, currentItem]);
+      console.log(ServiceItems)
     setCurrentItem({
   productName: "",
   model: "",
@@ -265,7 +266,7 @@ const [currentItem, setCurrentItem] = useState({
   {/* Display Added Items */}
   {serviceItems.map((item, index) => (
     <div key={index} className="border p-3 rounded mb-2 bg-light">
-      <strong>{item.productName}</strong> | {item.model} | {item.serialNo} | Issue: {item.issue} | Amount:{item.amount}
+      <strong>{item.productName}</strong> | {item.model} | {item.serialNo} | Issue: {item.issue} | {item.amount}
     </div>
   ))}
 
