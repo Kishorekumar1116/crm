@@ -213,5 +213,5 @@ function EditInvoice() {
     </div>
   </div>
 );
-
+}
 export default EditInvoice;
