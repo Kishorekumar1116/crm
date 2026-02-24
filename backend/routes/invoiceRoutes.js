@@ -428,6 +428,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+// new
+router.get("/:id", async (req, res) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    res.json(invoice);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching invoice" });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    await Invoice.findByIdAndUpdate(req.params.id, req.body);
+    res.json({ message: "Invoice updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+
 // ==============================
 // DELETE
 // ==============================
