@@ -264,9 +264,7 @@ const [currentItem, setCurrentItem] = useState({
   {/* Display Added Items */}
   {serviceItems.map((item, index) => (
     <div key={index} className="border p-3 rounded mb-2 bg-light">
-      <strong>{item.productName}</strong> | {item.model} | {item.serialNo}
-      <br />
-      Issue: {item.issue}
+      <strong>{item.productName}</strong> | {item.model} | {item.serialNo} | Issue: {item.issue} | Amount:{item.amount}
     </div>
   ))}
 
