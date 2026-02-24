@@ -86,9 +86,9 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   const tableTop = doc.y;
   const itemX = 50;
-const priceX = 330;
-const qtyX = 410;
-const amountX = 470;
+  const priceX = 330;
+  const qtyX = 410;
+  const amountX = 470;
 
   doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
 
@@ -124,10 +124,10 @@ const amountX = 470;
     align: "right",
   });
 
- doc.text(`${qty}`, qtyX, rowTop, {
-  width: 40,
-  align: "right",
-});
+  doc.text(`${qty}`, qtyX, rowTop, {
+    width: 40,
+    align: "right",
+  });
 
   doc.text(`₹ ${total.toFixed(2)}`, amountX, rowTop, {
     width: 80,
@@ -440,4 +440,4 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; 
