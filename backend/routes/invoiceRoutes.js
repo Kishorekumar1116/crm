@@ -150,14 +150,14 @@ let grandTotal = 0;
   doc.moveDown(1);
 });
 
-  // =========================
-  // TOTALS (ONLY TOTAL)
-  // =========================
+// =========================
+// TOTALS (ONLY TOTAL)
+// =========================
 doc.font("Helvetica-Bold");
-  
+
 const totalsXLabel = 360;
 const totalsXAmount = 460;
-  
+
 let totalsY = doc.y;
 const lineGap = 18;
 
@@ -191,13 +191,16 @@ doc.text(finalTotal.toFixed(2), totalsXAmount, totalsY, {
 });
 totalsY += lineGap;
 
-// Balance
-doc.text("Balance Due", totalsXLabel, totalsY);
-doc.text("0.00", totalsXAmount, totalsY, {
-  width: 80,
-  align: "right",
-});
-
+// Balance (ONLY IF > 0)
+const balance = finalTotal - finalTotal; // Adjust if you have payments applied
+if (balance > 0) {
+  doc.text("Balance Due", totalsXLabel, totalsY);
+  doc.text(balance.toFixed(2), totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
+}
+  
   // =========================
 // CUSTOMER NOTES
 // =========================
