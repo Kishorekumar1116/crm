@@ -110,8 +110,7 @@ doc.font("Helvetica");
 
 let grandTotal = 0;
 
-invoice.serviceItems.forEach((item, index) => {
-
+(invoice.serviceItems || []).forEach((item, index) => {
   const rowTop = doc.y;
 
   const price = Number(item.amount);
