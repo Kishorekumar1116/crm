@@ -257,29 +257,7 @@ doc.end();
 };
 
 
-// ==============================
-// AUTO INVOICE NUMBER GENERATION
-// ==============================
 
-const year = new Date().getFullYear();
-
-// Find last invoice of this year
-const lastInvoice = await Invoice.findOne({
-  invoiceNumber: { $regex: `INV-${year}` }
-}).sort({ createdAt: -1 });
-
-let nextNumber = 1;
-
-if (lastInvoice && lastInvoice.invoiceNumber) {
-  const lastNumber = parseInt(
-    lastInvoice.invoiceNumber.split("-")[2]
-  );
-  nextNumber = lastNumber + 1;
-}
-
-const formattedNumber = String(nextNumber).padStart(2, "0");
-
-const invoiceNumber = `INV-${year}-${formattedNumber}`;
 
 router.post("/", async (req, res) => {
   try {
