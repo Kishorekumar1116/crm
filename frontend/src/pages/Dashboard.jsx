@@ -58,6 +58,7 @@ function Dashboard() {
         {menuButton("Create Invoice", "/invoice", "success")}
         {menuButton("View All Invoices", "/all-invoices", "warning")}
         {menuButton("Create Quotation", "/quotation", "info")}
+        {menuButton("View All Quotation", "/quotation-list", "warning")}
         {menuButton("All Customers", "/customers", "secondary")}
 
 
