@@ -145,9 +145,11 @@ const [currentItem, setCurrentItem] = useState({
                   <div className="p-4 bg-white rounded-4 shadow-sm border-top border-primary border-4 h-100">
                     <h6 className="text-primary fw-bold mb-3">FROM:</h6>
                     <h5 className="fw-bold">iPremium Care</h5>
-                    <p className="small mb-1 text-muted">📍 iPremium India - HSR Layout
-114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout Bengaluru, Karnataka
-India - 560102</p>
+                   <p className="small mb-1 text-muted">
+  📍 iPremium India - HSR Layout <br />
+  114-115, 80 ft road, 27th Main Rd, 2nd Sector, HSR Layout Bengaluru, Karnataka <br />
+  India - 560102
+</p>
                     <p className="small mb-1 text-muted">🆔 GST: 29AAKFI8994H1ZH</p>
                     <p className="small mb-0 text-muted">📞 +91 8884417766</p>
                     <p className="small mb-0 text-muted">Email: support@ipremiumindia.co.in </p>
@@ -271,7 +273,7 @@ India - 560102</p>
 
 </div>
                   
-
+              </div>
               {/* Notes */}
               <div className="mb-4">
                 <label className="form-label fw-bold text-muted small">
