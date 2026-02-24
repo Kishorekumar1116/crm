@@ -156,6 +156,20 @@ function InvoiceList() {
                       >
                         📩 Send Email
                       </button>
+
+                       <button
+    onClick={() => editInvoice(inv._id)}
+    className="btn btn-sm btn-warning mx-1"
+  >
+    ✏️ Edit
+  </button>
+
+  <button
+    onClick={() => deleteInvoice(inv._id)}
+    className="btn btn-sm btn-danger mx-1"
+  >
+    🗑 Delete
+  </button>
                      
                     </td>
                   </tr>
