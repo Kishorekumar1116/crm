@@ -23,7 +23,7 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   // TITLE
   // =========================
-  doc.fontSize(24).font("Helvetica-Bold").text("INVOICE", {
+  doc.fontSize(24).font("Helvetica-Bold").text("iPremium Care INVOICE", {
     align: "center",
   });
 
