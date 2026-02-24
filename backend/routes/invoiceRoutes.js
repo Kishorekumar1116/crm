@@ -154,7 +154,10 @@ let grandTotal = 0;
   // TOTALS (ONLY TOTAL)
   // =========================
 doc.font("Helvetica-Bold");
-
+  
+const totalsXLabel = 360;
+const totalsXAmount = 460;
+  
 let totalsY = doc.y;
 const lineGap = 18;
 
