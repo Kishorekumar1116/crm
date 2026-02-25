@@ -51,12 +51,13 @@ const generatePDFContent = (doc, invoice, flattened) => {
   const leftBottomY = doc.y;
   
 // INVOICE INFO (RIGHT) - ADD DATE
-doc.font("Helvetica-Bold");
-doc.text(
-  `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
-  rightX,
-  startY
-);
+  // Add Invoice Date
+doc.font("Helvetica");
+const invoiceDate = invoice.createdAt
+  ? new Date(invoice.createdAt).toLocaleDateString("en-IN")
+  : new Date().toLocaleDateString("en-IN");
+
+doc.text(`Date: ${invoiceDate}`, rightX);
   
 // Add Due Date if available
 if (invoice.dueDate) {
@@ -64,15 +65,12 @@ if (invoice.dueDate) {
   doc.text(`Due Date: ${dueDate}`, rightX);
 }
   
-// Add Invoice Date
-doc.font("Helvetica");
-const invoiceDate = invoice.createdAt
-  ? new Date(invoice.createdAt).toLocaleDateString("en-IN")
-  : new Date().toLocaleDateString("en-IN");
-
-doc.text(`Date: ${invoiceDate}`, rightX);
-
-
+doc.font("Helvetica-Bold");
+doc.text(
+  `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
+  rightX,
+  startY
+);
 
 // Total Amount
 doc.text(
