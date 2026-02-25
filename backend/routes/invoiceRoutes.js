@@ -49,24 +49,39 @@ const generatePDFContent = (doc, invoice, flattened) => {
   doc.text("TAX ID: 29AAKFI8994H1ZH");
 
   const leftBottomY = doc.y;
+  
+// INVOICE INFO (RIGHT) - ADD DATE
+doc.font("Helvetica-Bold");
+doc.text(
+  `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
+  rightX,
+  startY
+);
 
-  // INVOICE INFO (RIGHT) - DUE DATE REMOVED
-  doc.font("Helvetica-Bold");
-  doc.text(
-    `Invoice # IPI ${invoice.invoiceNumber || invoice._id}`,
-    rightX,
-    startY
-  );
+// Add Invoice Date
+doc.font("Helvetica");
+const invoiceDate = invoice.createdAt
+  ? new Date(invoice.createdAt).toLocaleDateString("en-IN")
+  : new Date().toLocaleDateString("en-IN");
 
+doc.text(`Date: ${invoiceDate}`, rightX);
+
+// Add Due Date if available
+if (invoice.dueDate) {
+  const dueDate = new Date(invoice.dueDate).toLocaleDateString("en-IN");
+  doc.text(`Due Date: ${dueDate}`, rightX);
+}
+
+// Total Amount
 doc.text(
   `Total Amount: ${Number(invoice.amount).toFixed(2)}`,
   rightX
 );
 
-  const rightBottomY = doc.y;
+const rightBottomY = doc.y;
 
-  doc.y = Math.max(leftBottomY, rightBottomY) + 30;
-
+// Move down to start the next section
+doc.y = Math.max(leftBottomY, rightBottomY) + 30;
   // =========================
   // TO SECTION
   // =========================
