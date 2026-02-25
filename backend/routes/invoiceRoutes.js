@@ -57,7 +57,13 @@ doc.text(
   rightX,
   startY
 );
-
+  
+// Add Due Date if available
+if (invoice.dueDate) {
+  const dueDate = new Date(invoice.dueDate).toLocaleDateString("en-IN");
+  doc.text(`Due Date: ${dueDate}`, rightX);
+}
+  
 // Add Invoice Date
 doc.font("Helvetica");
 const invoiceDate = invoice.createdAt
@@ -66,11 +72,7 @@ const invoiceDate = invoice.createdAt
 
 doc.text(`Date: ${invoiceDate}`, rightX);
 
-// Add Due Date if available
-if (invoice.dueDate) {
-  const dueDate = new Date(invoice.dueDate).toLocaleDateString("en-IN");
-  doc.text(`Due Date: ${dueDate}`, rightX);
-}
+
 
 // Total Amount
 doc.text(
