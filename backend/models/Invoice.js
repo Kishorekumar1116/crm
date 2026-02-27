@@ -27,6 +27,15 @@ const invoiceSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    includeBalance: {
+  type: Boolean,
+  default: false,
+},
+
+balanceAmount: {
+  type: Number,
+  default: 0,
+},
 
     notes: String,
     status: String,
