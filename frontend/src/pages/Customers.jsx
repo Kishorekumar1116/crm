@@ -88,6 +88,7 @@ function Customers() {
                     <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
                     <td>
+                      
                       <button
                         className="btn btn-sm btn-success me-1 mb-1"
                         onClick={() => navigate(`/invoice?customerId=${item._id}`)}
@@ -100,6 +101,12 @@ function Customers() {
                       >
                         Quotation
                       </button>
+                      <button
+  className="btn btn-sm btn-primary me-1 mb-1"
+  onClick={() => navigate(`/edit-customer/${item._id}`)}
+>
+  Edit
+</button>
                     </td>
                   </tr>
                 ))
