@@ -23,6 +23,11 @@ const invoiceSchema = new mongoose.Schema(
     includeGST: Boolean,
     amount: Number,
 
+    amountPaid: {
+      type: Number,
+      default: 0,
+    },
+
     notes: String,
     status: String,
     dueDate: Date,
