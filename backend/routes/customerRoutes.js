@@ -18,11 +18,22 @@ const sanitizeFields = (data) => {
 // Create Job
 router.post("/", async (req, res) => {
   try {
-    const jobId = "JOB-" + Date.now(); // safer unique ID
+    // Generate JOB ID
+    const jobId = "JOB-" + Date.now();
+
+    // 🔥 Find last IPC number
+    const lastCustomer = await Customer.findOne().sort({ ipcNumber: -1 });
+
+    let nextIpcNumber = 1;
+
+    if (lastCustomer && lastCustomer.ipcNumber) {
+      nextIpcNumber = lastCustomer.ipcNumber + 1;
+    }
 
     const newCustomer = new Customer({
       ...req.body,
-      jobId
+      jobId,
+      ipcNumber: nextIpcNumber
     });
 
     const saved = await newCustomer.save();
@@ -33,7 +44,6 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 // Get All Jobs
 router.get("/", async (req, res) => {
   try {
