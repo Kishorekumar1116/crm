@@ -200,12 +200,12 @@ function InvoiceList() {
     ✏️ Edit
   </button>
 
-   <button
+   {/* <button
     onClick={() => deleteInvoice(inv._id)}
     className="btn btn-sm btn-danger mx-1"
   >
     🗑 Delete
-  </button> 
+  </button>  */}
                      
                     </td>
                   </tr>
