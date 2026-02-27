@@ -68,147 +68,100 @@ function EditInvoice() {
     }
   };
 
- return (
-  <div className="container py-5">
-    <div className="row justify-content-center">
-      <div className="col-lg-8">
-        <div
-          className="card shadow-lg border-0 rounded-4"
-          style={{
-            backdropFilter: "blur(10px)",
-            background: "linear-gradient(145deg, #ffffff, #f3f4ff)",
-          }}
-        >
-          <div className="card-body p-5">
-
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="fw-bold text-primary mb-0">
-                ✏️ Edit Invoice
-              </h3>
-              <button
-                className="btn btn-sm btn-outline-secondary"
-                onClick={() => navigate("/invoices")}
-              >
-                ← Back
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdate}>
-
-              {/* Customer Name */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Customer Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Phone */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Amount */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Amount</label>
-                <input
-                  type="number"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Product */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Product</label>
-                <input
-                  type="text"
-                  name="productName"
-                  value={formData.productName}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Model */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Model</label>
-                <input
-                  type="text"
-                  name="model"
-                  value={formData.model}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Serial No */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Serial Number</label>
-                <input
-                  type="text"
-                  name="serialNo"
-                  value={formData.serialNo}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Issue */}
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Issue</label>
-                <input
-                  type="text"
-                  name="issue"
-                  value={formData.issue}
-                  onChange={handleChange}
-                  className="form-control rounded-pill shadow-sm"
-                />
-              </div>
-
-              {/* Notes */}
-              <div className="mb-4">
-                <label className="form-label fw-semibold">Notes</label>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  className="form-control rounded-4 shadow-sm"
-                  rows="3"
-                />
-              </div>
-
-              <div className="d-grid">
-                <button
-                  type="submit"
-                  className="btn btn-lg rounded-pill text-white shadow"
-                  style={{
-                    background: "linear-gradient(90deg, #4e54c8, #8f94fb)",
-                    transition: "0.3s",
-                  }}
-                  onMouseOver={e => e.currentTarget.style.transform = "scale(1.03)"}
-                  onMouseOut={e => e.currentTarget.style.transform = "scale(1)"}
-                >
-                  💾 Update Invoice
-                </button>
-              </div>
-
-            </form>
-          </div>
+return (
+  <div
+    className="d-flex justify-content-center align-items-center"
+    style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #1e1f2f, #2c2f48)",
+    }}
+  >
+    <div className="col-lg-7">
+      <div
+        className="card border-0 p-4"
+        style={{
+          borderRadius: "25px",
+          background: "rgba(255, 255, 255, 0.08)",
+          backdropFilter: "blur(25px)",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+        }}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h3 className="text-white fw-bold mb-0">
+            ✏️ Edit Invoice
+          </h3>
+          <button
+            className="btn btn-sm btn-light rounded-pill px-3"
+            onClick={() => navigate("/invoices")}
+          >
+            ← Back
+          </button>
         </div>
+
+        <form onSubmit={handleUpdate}>
+          {[
+            { label: "Customer Name", name: "name", type: "text" },
+            { label: "Phone", name: "phone", type: "text" },
+            { label: "Amount", name: "amount", type: "number" },
+            { label: "Product Name", name: "productName", type: "text" },
+            { label: "Model", name: "model", type: "text" },
+            { label: "Serial Number", name: "serialNo", type: "text" },
+            { label: "Issue", name: "issue", type: "text" },
+          ].map((field, index) => (
+            <div className="form-floating mb-3" key={index}>
+              <input
+                type={field.type}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+                className="form-control rounded-4 border-0"
+                placeholder={field.label}
+                style={{
+                  background: "rgba(255,255,255,0.15)",
+                  color: "#fff",
+                }}
+              />
+              <label className="text-light">{field.label}</label>
+            </div>
+          ))}
+
+          <div className="form-floating mb-4">
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              className="form-control rounded-4 border-0"
+              placeholder="Notes"
+              style={{
+                height: "100px",
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+              }}
+            />
+            <label className="text-light">Notes</label>
+          </div>
+
+          <div className="d-grid">
+            <button
+              type="submit"
+              className="btn btn-lg fw-semibold text-white"
+              style={{
+                borderRadius: "50px",
+                background: "linear-gradient(90deg, #4e54c8, #8f94fb)",
+                boxShadow: "0 10px 25px rgba(78,84,200,0.5)",
+                transition: "all 0.3s ease",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.transform = "translateY(-3px)")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
+            >
+              💾 Update Invoice
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
