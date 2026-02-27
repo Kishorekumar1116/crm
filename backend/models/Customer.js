@@ -26,6 +26,7 @@ const customerSchema = new mongoose.Schema({
 
   // Service Info
   issue: { type: String, required: true },
+  additionalIssues: {type: String},
   technician: { type: String,  required: true },
   priority: { type: String, enum: ["Low","Medium","High","Urgent"], default: "Medium" },
   status: { type: String, enum: ["Pending","In Progress","Completed","Delivered"], default: "Pending" }
