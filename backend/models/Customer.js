@@ -6,6 +6,10 @@ const customerSchema = new mongoose.Schema({
   deliveryDate: Date,
 
   // Customer Info
+  ipcNumber: {
+  type: Number,
+  unique: true
+}
   name: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String,  required: true },
