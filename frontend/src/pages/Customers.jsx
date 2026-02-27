@@ -44,7 +44,8 @@ function Customers() {
           <table className="table table-striped table-hover table-bordered">
             <thead className="table-dark text-center">
               <tr>
-                <th>S.No</th>
+               
+                <th>IPC No</th>
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Email</th>
@@ -66,7 +67,10 @@ function Customers() {
               {filteredData.length > 0 ? (
                filteredData.map((item, index) => (
                   <tr key={item._id} className="text-center">
-                    <td>IPC-{index + 1}</td>
+                    
+                    <td>
+  IPC-{String(item.ipcNumber).padStart(3, "0")}
+</td>
                     <td>{item.name || "—"}</td>
                     <td>{item.phone || "—"}</td>
                     <td>{item.email || "—"}</td>
