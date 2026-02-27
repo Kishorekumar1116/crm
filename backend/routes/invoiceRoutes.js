@@ -206,16 +206,30 @@ doc.text(totalPrice.toFixed(2), totalsXAmount, totalsY, {
 });
 totalsY += lineGap;
 
-// ✅ Manual Balance Only If Checked
-if (invoice.includeBalance) {
-  const manualBalance = Number(invoice.balanceAmount || 0);
+// Paid & Balance Auto Calculation
+const paid = Number(invoice.amountPaid || 0);
+const balanceDue = totalPrice - paid;
 
+// Paid Amount
+doc.text("Paid Amount", totalsXLabel, totalsY);
+doc.text(paid.toFixed(2), totalsXAmount, totalsY, {
+  width: 80,
+  align: "right",
+});
+totalsY += lineGap;
+
+// Balance Due
+if (balanceDue > 0) {
   doc.fillColor("red");
   doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text(manualBalance.toFixed(2), totalsXAmount, totalsY, {
+  doc.text(balanceDue.toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
+  doc.fillColor("black");
+} else {
+  doc.fillColor("green");
+  doc.text("PAID", totalsXLabel, totalsY);
   doc.fillColor("black");
 }
   
@@ -321,9 +335,7 @@ const {
   notes,
   status,
   dueDate,
-  amountPaid,
-  includeBalance,
-  balanceAmount
+  amountPaid
 } = req.body;
 
     if (!customerId || !amount) {
@@ -364,8 +376,7 @@ const invoice = await Invoice.create({
   notes,
   status,
   dueDate,
-  includeBalance,
-  balanceAmount,
+  amountPaid,
   invoiceNumber,
 });
     await invoice.populate("customerId");
