@@ -68,8 +68,10 @@ function Customers() {
                filteredData.map((item, index) => (
                   <tr key={item._id} className="text-center">
                     
-                    <td>
-  IPC-{String(item.ipcNumber).padStart(3, "0")}
+<td>
+  {item.ipcNumber
+    ? `IPC-${String(item.ipcNumber).padStart(3, "0")}`
+    : "—"}
 </td>
                     <td>{item.name || "—"}</td>
                     <td>{item.phone || "—"}</td>
