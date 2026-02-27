@@ -7,8 +7,7 @@ function Invoice() {
   const [selected, setSelected] = useState("");
   const [includeGST, setIncludeGST] = useState(false);
 const [amountPaid, setAmountPaid] = useState(0);
-  const [includeBalance, setIncludeBalance] = useState(false);
-const [balanceAmount, setBalanceAmount] = useState("");
+
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -78,15 +77,15 @@ if (serviceItems.length === 0) {
 
     try {
       // 1. Send data to backend
-    const res = await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
+   await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
   customerId: selected,
+  subtotal,
   amount: finalAmount,
   includeGST,
   gst: gstAmount,
   notes,
   serviceItems,
-  includeBalance,
-  balanceAmount
+  amountPaid
 });
 
       setSuccess("Invoice Created Successfully! ✅ Redirecting to List...");
@@ -334,7 +333,12 @@ if (serviceItems.length === 0) {
     onChange={(e) => setAmountPaid(e.target.value)}
   />
 </div>
-
+<div className="mt-2 text-end">
+  <small className="text-muted">Balance Due:</small>
+  <h6 className="text-danger fw-bold">
+    ₹ {(finalAmount - Number(amountPaid || 0)).toFixed(2)}
+  </h6>
+</div>
   {/* Final Amount */}
   <div className="mt-3">
     <label className="fw-bold">TOTAL AMOUNT</label>
