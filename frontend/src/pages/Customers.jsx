@@ -56,6 +56,7 @@ function Customers() {
                 <th>Model</th>
                 <th>Serial No</th>
                 <th>Issue</th>
+                <th>Additional Issues</th>
                 <th>Technician</th>
                 <th>Actions</th>
               </tr>
@@ -76,6 +77,7 @@ function Customers() {
                     <td>{item.model || "—"}</td>
                     <td>{item.serialNo || "—"}</td>
                     <td>{item.issue || "—"}</td>
+                    <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
                     <td>
                       <button
@@ -95,7 +97,7 @@ function Customers() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="14" className="text-center">
+                  <td colSpan="15" className="text-center">
                     No customers found
                   </td>
                 </tr>
