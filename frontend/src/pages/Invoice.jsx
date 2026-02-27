@@ -77,13 +77,15 @@ if (serviceItems.length === 0) {
 
     try {
       // 1. Send data to backend
-      const res = await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
+    const res = await axios.post("https://ipremium-crm.onrender.com/api/invoices", {
   customerId: selected,
- amount: finalAmount,
-includeGST,
-gstAmount,
+  amount: finalAmount,
+  includeGST,
+  gst: gstAmount,
   notes,
-  serviceItems   
+  serviceItems,
+  includeBalance,
+  balanceAmount
 });
 
       setSuccess("Invoice Created Successfully! ✅ Redirecting to List...");
