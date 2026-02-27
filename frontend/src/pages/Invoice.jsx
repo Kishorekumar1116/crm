@@ -7,6 +7,8 @@ function Invoice() {
   const [selected, setSelected] = useState("");
   const [includeGST, setIncludeGST] = useState(false);
 const [amountPaid, setAmountPaid] = useState(0);
+  const [includeBalance, setIncludeBalance] = useState(false);
+const [balanceAmount, setBalanceAmount] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
