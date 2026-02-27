@@ -305,7 +305,7 @@ doc.end();
 
 router.post("/", async (req, res) => {
   try {
-   const {
+const {
   customerId,
   serviceItems,
   subtotal,
@@ -314,7 +314,9 @@ router.post("/", async (req, res) => {
   amount,
   notes,
   status,
-  dueDate
+  dueDate,
+  includeBalance,
+  balanceAmount
 } = req.body;
 
     if (!customerId || !amount) {
@@ -345,7 +347,7 @@ router.post("/", async (req, res) => {
     const formattedNumber = String(nextNumber).padStart(2, "0");
     const invoiceNumber = `INV-${year}-${formattedNumber}`;
 
-    const invoice = await Invoice.create({
+const invoice = await Invoice.create({
   customerId,
   serviceItems,
   subtotal,
@@ -355,9 +357,10 @@ router.post("/", async (req, res) => {
   notes,
   status,
   dueDate,
+  includeBalance,
+  balanceAmount,
   invoiceNumber,
 });
-
     await invoice.populate("customerId");
 
     const flattened = {
