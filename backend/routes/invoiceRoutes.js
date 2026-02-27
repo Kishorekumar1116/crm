@@ -164,9 +164,9 @@ let grandTotal = 0;
   doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown(1);
 });
-
+  
 // =========================
-// TOTALS (ONLY TOTAL)
+// TOTALS
 // =========================
 doc.font("Helvetica-Bold");
 
@@ -188,14 +188,17 @@ doc.text(subtotal.toFixed(2), totalsXAmount, totalsY, {
 });
 totalsY += lineGap;
 
-// GST (if enabled)
+// GST
 if (invoice.includeGST) {
   doc.text("GST (18%)", totalsXLabel, totalsY);
- 
+  doc.text(gst.toFixed(2), totalsXAmount, totalsY, {
+    width: 80,
+    align: "right",
+  });
   totalsY += lineGap;
 }
 
-// Final Total
+// Total
 doc.text("Total Amount", totalsXLabel, totalsY);
 doc.text(finalTotal.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
@@ -203,14 +206,16 @@ doc.text(finalTotal.toFixed(2), totalsXAmount, totalsY, {
 });
 totalsY += lineGap;
 
-// Balance (ONLY IF > 0)
-const balance = finalTotal - finalTotal; // Adjust if you have payments applied
-if (invoice.includeBalance && invoice.balanceAmount > 0) {
+// ✅ Balance Due
+if (invoice.includeBalance && Number(invoice.balanceAmount) > 0) {
+  doc.fillColor("red");
   doc.text("Balance Due", totalsXLabel, totalsY);
   doc.text(Number(invoice.balanceAmount).toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
+  doc.fillColor("black");
+  totalsY += lineGap;
 }
   
   // =========================
