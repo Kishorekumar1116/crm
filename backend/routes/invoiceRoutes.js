@@ -205,9 +205,9 @@ totalsY += lineGap;
 
 // Balance (ONLY IF > 0)
 const balance = finalTotal - finalTotal; // Adjust if you have payments applied
-if (balance > 0) {
+if (invoice.includeBalance && invoice.balanceAmount > 0) {
   doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text(balance.toFixed(2), totalsXAmount, totalsY, {
+  doc.text(Number(invoice.balanceAmount).toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
