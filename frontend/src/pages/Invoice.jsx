@@ -6,6 +6,8 @@ function Invoice() {
   const [customers, setCustomers] = useState([]);
   const [selected, setSelected] = useState("");
   const [includeGST, setIncludeGST] = useState(false);
+  const [includeBalance, setIncludeBalance] = useState(false);
+  const [balanceAmount, setBalanceAmount] = useState(0);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -319,6 +321,32 @@ gstAmount,
       <h6>₹ {gstAmount.toFixed(2)}</h6>
     </div>
   )}
+    {/* Balance Due Checkbox */}
+<div className="form-check d-flex justify-content-end mb-2">
+  <input
+    className="form-check-input me-2"
+    type="checkbox"
+    checked={includeBalance}
+    onChange={() => setIncludeBalance(!includeBalance)}
+    id="balanceCheck"
+  />
+  <label className="form-check-label" htmlFor="balanceCheck">
+    Add Balance Due
+  </label>
+</div>
+
+{/* Balance Input */}
+{includeBalance && (
+  <div className="mb-2 text-end">
+    <small className="text-muted">Balance Amount:</small>
+    <input
+      type="number"
+      className="form-control text-end"
+      value={balanceAmount}
+      onChange={(e) => setBalanceAmount(e.target.value)}
+    />
+  </div>
+)}
 
   {/* Final Amount */}
   <div className="mt-3">
@@ -335,7 +363,7 @@ gstAmount,
   </div>
 
 </div>
-                  
+              
               </div>
               {/* Notes */}
               <div className="mb-4">
