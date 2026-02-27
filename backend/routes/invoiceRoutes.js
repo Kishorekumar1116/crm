@@ -179,8 +179,6 @@ const lineGap = 18;
 const subtotalCalc = Number(invoice.subtotal || grandTotal);
 const gstCalc = Number(invoice.gst || 0);
 const totalPrice = Number(invoice.amount || subtotalCalc);
-const paid = Number(invoice.amountPaid || 0);
-const balanceDue = totalPrice - paid;
 
 // Subtotal
 doc.text("Subtotal", totalsXLabel, totalsY);
@@ -200,27 +198,21 @@ if (invoice.includeGST) {
   totalsY += lineGap;
 }
 
-// Total Price
-doc.text("Total Price", totalsXLabel, totalsY);
+// Total
+doc.text("Total Amount", totalsXLabel, totalsY);
 doc.text(totalPrice.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
   align: "right",
 });
 totalsY += lineGap;
 
-// Paid Amount
-doc.text("Paid Amount", totalsXLabel, totalsY);
-doc.text(paid.toFixed(2), totalsXAmount, totalsY, {
-  width: 80,
-  align: "right",
-});
-totalsY += lineGap;
+// ✅ Manual Balance Only If Checked
+if (invoice.includeBalance) {
+  const manualBalance = Number(invoice.balanceAmount || 0);
 
-// Balance Due (Auto Calculate)
-if (balanceDue > 0) {
   doc.fillColor("red");
   doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text(balanceDue.toFixed(2), totalsXAmount, totalsY, {
+  doc.text(manualBalance.toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
@@ -329,7 +321,9 @@ const {
   notes,
   status,
   dueDate,
-  amountPaid
+  amountPaid,
+  includeBalance,
+  balanceAmount
 } = req.body;
 
     if (!customerId || !amount) {
@@ -370,7 +364,8 @@ const invoice = await Invoice.create({
   notes,
   status,
   dueDate,
-  amountPaid,
+  includeBalance,
+  balanceAmount,
   invoiceNumber,
 });
     await invoice.populate("customerId");
