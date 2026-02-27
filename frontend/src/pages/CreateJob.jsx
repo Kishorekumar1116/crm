@@ -26,6 +26,7 @@ function CreateJob() {
   model: "",
   serialNo: "",
   issue: "",
+  additionalIssues: "",
   technician: "",
   priority: "Medium",
   status: "Pending",
@@ -155,6 +156,15 @@ function CreateJob() {
                         <div className="col-md-6 mb-3">
                             <textarea name="issue" value={form.issue} onChange={handleChange} className="form-control" placeholder="Describe Issue" />
                         </div>
+                        <div className="col-md-12 mb-3">
+  <textarea
+    name="additionalIssues"
+    value={form.additionalIssues}
+    onChange={handleChange}
+    className="form-control"
+    placeholder="Additional Issues (Optional)"
+  />
+</div>
                         <div className="col-md-6 mb-3">
                             <input name="technician" value={form.technician} onChange={handleChange} className="form-control" placeholder="Technician Name" />
                         </div>
