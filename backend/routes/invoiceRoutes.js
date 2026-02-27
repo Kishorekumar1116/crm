@@ -208,7 +208,7 @@ totalsY += lineGap;
 
 // Paid & Balance Auto Calculation
 const paid = Number(invoice.amountPaid || 0);
-const balanceDue = totalPrice - paid;
+const balanceDue = Math.max(totalPrice - paid, 0);
 
 // Paid Amount
 doc.text("Paid Amount", totalsXLabel, totalsY);
