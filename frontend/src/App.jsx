@@ -9,6 +9,7 @@ import Quotation from "./pages/Quotation";
 import InvoiceList from "./pages/InvoiceList";
 import QuotationList from "./pages/QuotationList";
 import EditInvoice from "./pages/EditInvoice";
+import EditCustomer from "./pages/EditCustomer";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/all-invoices" element={<InvoiceList />} />
         <Route path="/quotation-list" element={<QuotationList />} />
         <Route path="/invoice/edit/:id" element={<EditInvoice />} />
+        <Route path="/edit-customer/:id" element={<EditCustomer />} />
       </Routes>
     </BrowserRouter>
   );
