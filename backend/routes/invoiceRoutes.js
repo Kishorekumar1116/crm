@@ -176,13 +176,15 @@ const totalsXAmount = 460;
 let totalsY = doc.y;
 const lineGap = 18;
 
-const subtotal = Number(invoice.subtotal || grandTotal);
-const gst = Number(invoice.gst || 0);
-const finalTotal = Number(invoice.amount || subtotal);
+const subtotalCalc = Number(invoice.subtotal || grandTotal);
+const gstCalc = Number(invoice.gst || 0);
+const totalPrice = Number(invoice.amount || subtotalCalc);
+const paid = Number(invoice.amountPaid || 0);
+const balanceDue = totalPrice - paid;
 
 // Subtotal
 doc.text("Subtotal", totalsXLabel, totalsY);
-doc.text(subtotal.toFixed(2), totalsXAmount, totalsY, {
+doc.text(subtotalCalc.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
   align: "right",
 });
@@ -191,31 +193,38 @@ totalsY += lineGap;
 // GST
 if (invoice.includeGST) {
   doc.text("GST (18%)", totalsXLabel, totalsY);
-  doc.text(gst.toFixed(2), totalsXAmount, totalsY, {
+  doc.text(gstCalc.toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
   totalsY += lineGap;
 }
 
-// Total
-doc.text("Total Amount", totalsXLabel, totalsY);
-doc.text(finalTotal.toFixed(2), totalsXAmount, totalsY, {
+// Total Price
+doc.text("Total Price", totalsXLabel, totalsY);
+doc.text(totalPrice.toFixed(2), totalsXAmount, totalsY, {
   width: 80,
   align: "right",
 });
 totalsY += lineGap;
 
-// ✅ Balance Due
-if (invoice.includeBalance && Number(invoice.balanceAmount) > 0) {
+// Paid Amount
+doc.text("Paid Amount", totalsXLabel, totalsY);
+doc.text(paid.toFixed(2), totalsXAmount, totalsY, {
+  width: 80,
+  align: "right",
+});
+totalsY += lineGap;
+
+// Balance Due (Auto Calculate)
+if (balanceDue > 0) {
   doc.fillColor("red");
   doc.text("Balance Due", totalsXLabel, totalsY);
-  doc.text(Number(invoice.balanceAmount).toFixed(2), totalsXAmount, totalsY, {
+  doc.text(balanceDue.toFixed(2), totalsXAmount, totalsY, {
     width: 80,
     align: "right",
   });
   doc.fillColor("black");
-  totalsY += lineGap;
 }
   
   // =========================
@@ -320,8 +329,7 @@ const {
   notes,
   status,
   dueDate,
-  includeBalance,
-  balanceAmount
+  amountPaid
 } = req.body;
 
     if (!customerId || !amount) {
@@ -351,7 +359,7 @@ const {
 
     const formattedNumber = String(nextNumber).padStart(2, "0");
     const invoiceNumber = `INV-${year}-${formattedNumber}`;
-
+    
 const invoice = await Invoice.create({
   customerId,
   serviceItems,
@@ -362,8 +370,7 @@ const invoice = await Invoice.create({
   notes,
   status,
   dueDate,
-  includeBalance,
-  balanceAmount,
+  amountPaid,
   invoiceNumber,
 });
     await invoice.populate("customerId");
