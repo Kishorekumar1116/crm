@@ -23,12 +23,29 @@ const generatePDFContent = (doc, invoice, flattened) => {
   // =========================
   // TITLE
   // =========================
-  doc.fontSize(24).font("Helvetica-Bold").text("iPremium Care INVOICE", {
-    align: "center",
-  });
 
-  doc.moveDown(2);
 
+// =========================
+// LOGO + TITLE
+// =========================
+const path = require("path");
+
+const logoPath = path.join(process.cwd(), "logo.jpeg");
+
+// Add Logo
+doc.image(logoPath, doc.page.width / 2 - 60, 40, {
+  width: 120,
+});
+
+// Space below logo
+doc.moveDown(4);
+
+// Invoice title
+doc.fontSize(20)
+   .font("Helvetica-Bold")
+   .text("INVOICE", { align: "center" });
+
+doc.moveDown(2);
   // =========================
   // HEADER BLOCK
   // =========================
