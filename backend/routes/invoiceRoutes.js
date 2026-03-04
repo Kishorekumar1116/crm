@@ -37,10 +37,10 @@ doc.image(logoPath, doc.page.width / 2 - 60, 40, {
 });
 
 // Space below logo
-doc.moveDown(4);
+doc.moveDown(3);
 
 // Invoice title
-doc.fontSize(20)
+doc.fontSize(15)
    .font("Helvetica-Bold")
    .text("INVOICE", { align: "center" });
 
