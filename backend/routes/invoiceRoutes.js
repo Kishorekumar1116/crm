@@ -402,12 +402,13 @@ const invoice = await Invoice.create({
 });
     await invoice.populate("customerId");
 
-    const flattened = {
-      ...invoice.toObject(),
-      name: customer.name,
-      phone: customer.phone,
-      email: customer.email,
-    };
+  const flattened = {
+  ...invoice.toObject(),
+  name: customer.name,
+  phone: customer.phone,
+  email: customer.email,
+  gst: customer.gst || "",
+};
 
     // ==============================
     // AUTO EMAIL (INSIDE TRY BLOCK)
