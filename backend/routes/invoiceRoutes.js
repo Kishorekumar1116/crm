@@ -30,9 +30,8 @@ const generatePDFContent = (doc, invoice, flattened) => {
 // =========================
 const path = require("path");
 
-const logoPath = path.join(process.cwd(), "logo.jpeg");
+const logoPath = path.join(__dirname, "../assets/logo.jpeg");
 
-// Add Logo
 doc.image(logoPath, doc.page.width / 2 - 60, 40, {
   width: 120,
 });
