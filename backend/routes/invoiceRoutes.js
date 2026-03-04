@@ -456,7 +456,11 @@ router.get("/view-pdf/:id", async (req, res) => {
     const invoice = await Invoice.findById(req.params.id).populate("customerId");
     if (!invoice) return res.status(404).send("Not found");
 
-    const flattened = { ...invoice.toObject(), ...invoice.customerId._doc };
+    const flattened = {
+  ...invoice.toObject(),
+  ...invoice.customerId._doc,
+  gst: invoice.customerId?.gst || "",
+};
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
@@ -481,7 +485,11 @@ router.post("/send-email/:id", async (req, res) => {
       return res.status(404).json({ message: "Customer email not found" });
     }
 
-    const flattened = { ...invoice.toObject(), ...invoice.customerId._doc };
+   const flattened = {
+  ...invoice.toObject(),
+  ...invoice.customerId._doc,
+  gst: invoice.customerId?.gst || "",
+};
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
     const bufferStream = new streamBuffers.WritableStreamBuffer();
