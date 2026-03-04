@@ -104,12 +104,17 @@ doc.y = Math.max(leftBottomY, rightBottomY) + 30;
   doc.font("Helvetica-Bold").text("To", 50);
   doc.font("Helvetica");
 
-  doc.text(flattened.name || "");
-  doc.text("Bengaluru, Karnataka");
-  doc.text("India -");
-  doc.text(`Phone: ${flattened.phone || ""}`);
-  doc.text(`Email: ${flattened.email || ""}`);
+doc.text(flattened.name || "");
+doc.text("Bengaluru, Karnataka");
+doc.text("India -");
 
+if (flattened.gst && flattened.gst.trim() !== "") {
+  doc.text(`GST No: ${flattened.gst}`);
+}
+
+doc.text(`Phone: ${flattened.phone || ""}`);
+doc.text(`Email: ${flattened.email || ""}`);
+  
   doc.moveDown(2);
 
   // =========================
