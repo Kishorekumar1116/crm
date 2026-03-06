@@ -170,7 +170,13 @@ function InvoiceList() {
   )}
 </td>
 <td>
- {inv.gstNumber ? inv.gstNumber : "No GST"}
+  {inv.gstNumber && inv.gstNumber.trim() !== "" ? (
+    <span className="text-success fw-semibold">
+      {inv.gstNumber}
+    </span>
+  ) : (
+    <span className="text-muted">No GST</span>
+  )}
 </td>
                     <td>{inv.notes || "-"}</td>
                     <td className="text-center">
