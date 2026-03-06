@@ -135,14 +135,10 @@ return (
     name="gstNumber"
     value={formData.gstNumber}
     onChange={handleChange}
-    className="form-control rounded-4 border-0"
+    className="form-control"
     placeholder="GST Number"
-    style={{
-      background: "rgba(255,255,255,0.15)",
-      color: "#fff",
-    }}
   />
-  <label className="text-light">GST Number</label>
+  <label>GST Number</label>
 </div>
 
           
