@@ -26,12 +26,33 @@ function Customers() {
       (item.productName || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const sendJobSheet = (customer) => {
-    const message = `Hello ${customer.name},\nYour job sheet is ready.\nProduct: ${customer.productName}\nBrand: ${customer.brand}\nModel: ${customer.model}\nSerial No: ${customer.serialNo}\nIssue: ${customer.issue}`;
-    const phone = customer.phone.replace(/\D/g, ""); // remove non-numeric chars
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-  };
+ const sendJobSheet = (customer) => {
+  const message = `
+📄 Job Sheet Details
+
+IPC No: ${customer.ipcNumber ? `IPC-${String(customer.ipcNumber).padStart(3, "0")}` : "—"}
+Name: ${customer.name || "—"}
+Phone: ${customer.phone || "—"}
+Email: ${customer.email || "—"}
+Company: ${customer.company || "—"}
+GST: ${customer.gst || "—"}
+Address: ${customer.address1 || ""} ${customer.address2 || ""} ${customer.city || ""} 
+City: ${customer.city || "—"}
+
+Product Details:
+Product: ${customer.productName || "—"}
+Brand: ${customer.brand || "—"}
+Model: ${customer.model || "—"}
+Serial No: ${customer.serialNo || "—"}
+Issue: ${customer.issue || "—"}
+Additional Issues: ${customer.additionalIssues || "—"}
+Technician: ${customer.technician || "—"}
+`;
+
+  const phone = customer.phone.replace(/\D/g, ""); // only numbers
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+};
 
   return (
     <div className="container mt-5">
