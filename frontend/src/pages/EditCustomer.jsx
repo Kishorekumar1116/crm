@@ -36,9 +36,7 @@ function EditCustomer() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const res = await axios.get(
-          `https://ipremium-crm.onrender.com/api/customers/${id}`
-        );
+        const res =await axios.put(`https://ipremium-crm.onrender.com/api/customers/${id}`, form);
 
         const data = res.data.data || res.data;
 
