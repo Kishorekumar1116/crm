@@ -102,13 +102,25 @@ function Customers() {
                     <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
                     <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => setEditCustomer(item)}
-                      >
-                        Edit
-                      </button>
-                    </td>
+  <button
+    className="btn btn-sm btn-success me-1 mb-1"
+    onClick={() => navigate(`/invoice?customerId=${item._id}`)}
+  >
+    Invoice
+  </button>
+  <button
+    className="btn btn-sm btn-warning mb-1"
+    onClick={() => navigate(`/quotation?customerId=${item._id}`)}
+  >
+    Quotation
+  </button>
+  <button
+    className="btn btn-sm btn-primary me-1 mb-1"
+    onClick={() => setEditCustomer(item)}
+  >
+    Edit
+  </button>
+</td>
                   </tr>
                 ))
               ) : (
