@@ -7,27 +7,20 @@ function Customers() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  // Fetch all customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get(
-          "https://ipremium-crm.onrender.com/api/customers"
-        );
+        const res = await axios.get("https://ipremium-crm.onrender.com/api/customers");
         setData(res.data.data || res.data || []);
       } catch (err) {
-        console.log("Error fetching customers:", err);
+        console.log(err);
       }
     };
     fetchCustomers();
   }, []);
 
-  // WhatsApp Job Sheet function
+  // ✅ WhatsApp Job Sheet Send Function
   const sendJobSheet = (item) => {
-    if (!item.phone) {
-      alert("Customer phone number is missing!");
-      return;
-    }
 
     const message = `
 *JOB SHEET DETAILS*
@@ -55,14 +48,13 @@ Technician: ${item.technician || ""}
 Thank you - iPremium Service Center
 `;
 
-    // Add country code (example India: 91)
-    const phone = `91${item.phone}`;
+    const phone = `91${item.phone}`; // India country code
 
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
     window.open(url, "_blank");
   };
 
-  // Filter customers based on search input
   const filteredData = data.filter(
     (item) =>
       (item.name || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -110,20 +102,19 @@ Thank you - iPremium Service Center
               {filteredData.length > 0 ? (
                 filteredData.map((item) => (
                   <tr key={item._id} className="text-center">
+
                     <td>
                       {item.ipcNumber
                         ? `IPC-${String(item.ipcNumber).padStart(3, "0")}`
                         : "—"}
                     </td>
+
                     <td>{item.name || "—"}</td>
                     <td>{item.phone || "—"}</td>
                     <td>{item.email || "—"}</td>
                     <td>{item.company || "—"}</td>
                     <td>{item.gst || "—"}</td>
-                    <td>
-                      {`${item.address1 || ""} ${item.address2 || ""}`.trim() ||
-                        "—"}
-                    </td>
+                    <td>{`${item.address1 || ""} ${item.address2 || ""}`.trim() || "—"}</td>
                     <td>{item.city || "—"}</td>
                     <td>{item.productName || "—"}</td>
                     <td>{item.brand || "—"}</td>
@@ -132,39 +123,37 @@ Thank you - iPremium Service Center
                     <td>{item.issue || "—"}</td>
                     <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
+
                     <td>
+
                       <button
                         className="btn btn-sm btn-success me-1 mb-1"
                         onClick={() => sendJobSheet(item)}
-                        disabled={!item.phone}
                       >
                         Send Job Sheet
                       </button>
 
                       <button
                         className="btn btn-sm btn-success me-1 mb-1"
-                        onClick={() =>
-                          navigate(`/invoice?customerId=${item._id}`)
-                        }
+                        onClick={() => navigate(`/invoice?customerId=${item._id}`)}
                       >
                         Invoice
                       </button>
 
                       <button
                         className="btn btn-sm btn-warning me-1 mb-1"
-                        onClick={() =>
-                          navigate(`/quotation?customerId=${item._id}`)
-                        }
+                        onClick={() => navigate(`/quotation?customerId=${item._id}`)}
                       >
                         Quotation
                       </button>
 
-                   <button
-  className="btn btn-sm btn-primary me-1 mb-1"
-  onClick={() => navigate(`/edit-customer/${item._id}`)}
->
-  Edit
-</button>
+                      <button
+                        className="btn btn-sm btn-primary me-1 mb-1"
+                        onClick={() => navigate(`/edit-customer/${item._id}`)}
+                      >
+                        Edit
+                      </button>
+
                     </td>
                   </tr>
                 ))
@@ -176,6 +165,7 @@ Thank you - iPremium Service Center
                 </tr>
               )}
             </tbody>
+
           </table>
         </div>
       </div>
@@ -183,4 +173,4 @@ Thank you - iPremium Service Center
   );
 }
 
-export default Customers;
+export default Customers; 
