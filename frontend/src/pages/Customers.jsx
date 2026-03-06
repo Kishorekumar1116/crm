@@ -11,7 +11,6 @@ function Customers() {
     const fetchCustomers = async () => {
       try {
         const res = await axios.get("https://ipremium-crm.onrender.com/api/customers");
-        // ensure data is always an array
         setData(res.data.data || res.data || []);
       } catch (err) {
         console.log(err);
@@ -19,6 +18,42 @@ function Customers() {
     };
     fetchCustomers();
   }, []);
+
+  // ✅ WhatsApp Job Sheet Send Function
+  const sendJobSheet = (item) => {
+
+    const message = `
+*JOB SHEET DETAILS*
+
+IPC No: IPC-${String(item.ipcNumber || "").padStart(3, "0")}
+Name: ${item.name || ""}
+Phone: ${item.phone || ""}
+Email: ${item.email || ""}
+Company: ${item.company || ""}
+GST: ${item.gst || ""}
+
+Address: ${item.address1 || ""} ${item.address2 || ""}
+City: ${item.city || ""}
+
+Product: ${item.productName || ""}
+Brand: ${item.brand || ""}
+Model: ${item.model || ""}
+Serial No: ${item.serialNo || ""}
+
+Issue: ${item.issue || ""}
+Additional Issues: ${item.additionalIssues || ""}
+
+Technician: ${item.technician || ""}
+
+Thank you - iPremium Service Center
+`;
+
+    const phone = `91${item.phone}`; // India country code
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+    window.open(url, "_blank");
+  };
 
   const filteredData = data.filter(
     (item) =>
@@ -44,7 +79,6 @@ function Customers() {
           <table className="table table-striped table-hover table-bordered">
             <thead className="table-dark text-center">
               <tr>
-               
                 <th>IPC No</th>
                 <th>Name</th>
                 <th>Phone</th>
@@ -63,16 +97,18 @@ function Customers() {
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredData.length > 0 ? (
-               filteredData.map((item, index) => (
+                filteredData.map((item) => (
                   <tr key={item._id} className="text-center">
-                    
-<td>
-  {item.ipcNumber
-    ? `IPC-${String(item.ipcNumber).padStart(3, "0")}`
-    : "—"}
-</td>
+
+                    <td>
+                      {item.ipcNumber
+                        ? `IPC-${String(item.ipcNumber).padStart(3, "0")}`
+                        : "—"}
+                    </td>
+
                     <td>{item.name || "—"}</td>
                     <td>{item.phone || "—"}</td>
                     <td>{item.email || "—"}</td>
@@ -87,37 +123,49 @@ function Customers() {
                     <td>{item.issue || "—"}</td>
                     <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
+
                     <td>
-                      
+
+                      <button
+                        className="btn btn-sm btn-success me-1 mb-1"
+                        onClick={() => sendJobSheet(item)}
+                      >
+                        Send Job Sheet
+                      </button>
+
                       <button
                         className="btn btn-sm btn-success me-1 mb-1"
                         onClick={() => navigate(`/invoice?customerId=${item._id}`)}
                       >
                         Invoice
                       </button>
+
                       <button
-                        className="btn btn-sm btn-warning mb-1"
+                        className="btn btn-sm btn-warning me-1 mb-1"
                         onClick={() => navigate(`/quotation?customerId=${item._id}`)}
                       >
                         Quotation
                       </button>
+
                       <button
-  className="btn btn-sm btn-primary me-1 mb-1"
-  onClick={() => navigate(`/edit-customer/${item._id}`)}
->
-  Edit
-</button>
+                        className="btn btn-sm btn-primary me-1 mb-1"
+                        onClick={() => navigate(`/edit-customer/${item._id}`)}
+                      >
+                        Edit
+                      </button>
+
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                 <td colSpan="16" className="text-center">
+                  <td colSpan="16" className="text-center">
                     No customers found
                   </td>
                 </tr>
               )}
             </tbody>
+
           </table>
         </div>
       </div>
