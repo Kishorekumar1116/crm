@@ -5,11 +5,18 @@ import { useLocation } from "react-router-dom";
 function Quotation() {
   const [customers, setCustomers] = useState([]);
   const [selected, setSelected] = useState("");
-  const [amount, setAmount] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [customerData, setCustomerData] = useState({});
+  const [serviceItems, setServiceItems] = useState([]);
+  const [currentItem, setCurrentItem] = useState({
+    productName: "",
+    model: "",
+    serialNo: "",
+    issue: "",
+    amount: ""
+  });
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -28,6 +35,9 @@ function Quotation() {
     email: "support@ipremiumindia.co.in",
     gst: "29AAKFI8994H1ZH",
   };
+
+  // Calculate subtotal & total
+  const subtotal = serviceItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
   // Fetch customers
   useEffect(() => {
@@ -65,8 +75,13 @@ function Quotation() {
   }, [selected]);
 
   const createQuotation = async () => {
-    if (!selected || !amount) {
-      setError("Please select a customer and enter the amount.");
+    if (!selected) {
+      setError("Please select a customer.");
+      setSuccess("");
+      return;
+    }
+    if (serviceItems.length === 0) {
+      setError("Please add at least one service item.");
       setSuccess("");
       return;
     }
@@ -74,17 +89,15 @@ function Quotation() {
     try {
       await axios.post("https://ipremium-crm.onrender.com/api/quotations", {
         customerId: selected,
-        amount,
+        amount: subtotal,
         notes,
-        productName: customerData.latestProduct || "",
-        model: customerData.latestModel || "",
-        serialNo: customerData.latestSerial || "",
-        issue: customerData.latestIssue || "",
+        serviceItems
       });
 
       setSuccess("Quotation Created Successfully ✅");
       setError("");
-      setAmount("");
+      setServiceItems([]);
+      setCurrentItem({ productName: "", model: "", serialNo: "", issue: "", amount: "" });
       setNotes("");
     } catch (err) {
       console.error(err);
@@ -98,10 +111,9 @@ function Quotation() {
       <div className="row justify-content-center">
         <div className="col-lg-10">
           <div className="card border-0 shadow-lg" style={{ borderRadius: "20px", overflow: "hidden" }}>
-            
             {/* Header */}
             <div className="p-4 text-white d-flex justify-content-between align-items-center"
-                 style={{ background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)" }}>
+              style={{ background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)" }}>
               <div>
                 <h2 className="fw-bold mb-0">iPremium Care Quotation</h2>
                 <small className="opacity-75">Professional Quotation System</small>
@@ -125,14 +137,13 @@ function Quotation() {
                   style={{ borderRadius: "10px", padding: "12px" }}
                 >
                   <option value="">-- Choose Customer --</option>
-                  {customers.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name} ({c.phone})
-                    </option>
+                  {customers.map(c => (
+                    <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>
                   ))}
                 </select>
               </div>
 
+              {/* FROM & TO */}
               <div className="row g-4 mb-4">
                 {/* FROM */}
                 <div className="col-md-6">
@@ -152,47 +163,65 @@ function Quotation() {
                     <h6 className="text-info fw-bold mb-3">BILL TO:</h6>
                     <h5 className="fw-bold">{customerData?.name || "---"}</h5>
                     {customerData?.company && <p className="small mb-1 text-dark fw-semibold">🏢 {customerData.company}</p>}
-                    <p className="small mb-1 text-muted">📞 {customerData?.phone || "No Phone"}</p>
+                    <p className="small mb-1 text-muted">📞 {customerData?.phone || "---"}</p>
                     {customerData?.gst && <p className="small mb-1 text-muted">🆔 GST: {customerData.gst}</p>}
                     {customerData?.email && <p className="small mb-0 text-muted">📧 {customerData.email}</p>}
                   </div>
                 </div>
               </div>
 
-              {/* Service / Job Details */}
+              {/* Service Items */}
               <div className="bg-white rounded-4 shadow-sm overflow-hidden mb-4">
                 <div className="bg-dark text-white p-3 fw-bold">Service & Job Details</div>
                 <div className="p-4">
-                  {customerData?.latestProduct ? (
-                    <div className="row">
-                      <div className="col-md-8">
-                        <h6 className="fw-bold text-primary">{customerData.latestProduct}</h6>
-                        <div className="d-flex gap-2 mb-3">
-                          <span className="badge bg-light text-dark border">Model: {customerData.latestModel || "-"}</span>
-                          <span className="badge bg-light text-dark border">SN: {customerData.latestSerial || "-"}</span>
-                        </div>
-                        <div className="p-3 bg-warning bg-opacity-10 border-start border-warning border-4 rounded">
-                          <strong className="small text-uppercase text-warning d-block">Reported Issue:</strong>
-                          <span>{customerData.latestIssue || "No issue recorded"}</span>
-                        </div>
-                      </div>
-                      <div className="col-md-4 text-end">
-                        <label className="d-block small fw-bold text-muted mb-2">QUOTATION AMOUNT</label>
-                        <div className="input-group">
-                          <span className="input-group-text bg-white border-0 shadow-sm">₹</span>
-                          <input
-                            type="number"
-                            className="form-control form-control-lg border-0 shadow-sm bg-light fw-bold text-end"
-                            placeholder="0.00"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                          />
-                        </div>
-                      </div>
+                  {/* Input Row */}
+                  <div className="row g-3 mb-3">
+                    <div className="col-md-3">
+                      <input type="text" className="form-control" placeholder="Product Name"
+                        value={currentItem.productName}
+                        onChange={(e) => setCurrentItem({ ...currentItem, productName: e.target.value })} />
                     </div>
-                  ) : (
-                    <p className="text-center text-muted my-3">Please select a customer to see job data.</p>
-                  )}
+                    <div className="col-md-3">
+                      <input type="text" className="form-control" placeholder="Model"
+                        value={currentItem.model}
+                        onChange={(e) => setCurrentItem({ ...currentItem, model: e.target.value })} />
+                    </div>
+                    <div className="col-md-3">
+                      <input type="text" className="form-control" placeholder="Serial No"
+                        value={currentItem.serialNo}
+                        onChange={(e) => setCurrentItem({ ...currentItem, serialNo: e.target.value })} />
+                    </div>
+                    <div className="col-md-3">
+                      <input type="text" className="form-control" placeholder="Issue"
+                        value={currentItem.issue}
+                        onChange={(e) => setCurrentItem({ ...currentItem, issue: e.target.value })} />
+                    </div>
+                    <div className="col-md-3">
+                      <input type="number" className="form-control" placeholder="Amount"
+                        value={currentItem.amount}
+                        onChange={(e) => setCurrentItem({ ...currentItem, amount: e.target.value })} />
+                    </div>
+                  </div>
+
+                  {/* Add Item Button */}
+                  <button className="btn btn-sm btn-success mb-3" onClick={() => {
+                    if (!currentItem.productName) return;
+                    setServiceItems([...serviceItems, currentItem]);
+                    setCurrentItem({ productName: "", model: "", serialNo: "", issue: "", amount: "" });
+                  }}>+ Add Service</button>
+
+                  {/* Display Added Items */}
+                  {serviceItems.map((item, idx) => (
+                    <div key={idx} className="border p-3 rounded mb-2 bg-light">
+                      <strong>{item.productName}</strong> | {item.model} | {item.serialNo} | Issue: {item.issue} | ₹ {item.amount}
+                    </div>
+                  ))}
+
+                  {/* Subtotal */}
+                  <div className="text-end mt-3">
+                    <label className="d-block small fw-bold text-muted mb-2">QUOTATION AMOUNT</label>
+                    <h5>₹ {subtotal.toLocaleString("en-IN")}</h5>
+                  </div>
                 </div>
               </div>
 
@@ -205,15 +234,13 @@ function Quotation() {
                   placeholder="Mention warranty or service terms..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                ></textarea>
+                />
               </div>
 
               {/* Action Button */}
-              <button
-                className="btn btn-lg w-100 py-3 text-white fw-bold shadow-sm"
+              <button className="btn btn-lg w-100 py-3 text-white fw-bold shadow-sm"
                 style={{ background: "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)", borderRadius: "15px", border: "none" }}
-                onClick={createQuotation}
-              >
+                onClick={createQuotation}>
                 Create & Save Quotation
               </button>
             </div>
