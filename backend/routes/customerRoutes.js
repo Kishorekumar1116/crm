@@ -21,13 +21,16 @@ router.post("/", async (req, res) => {
       jobId,
       ipcNumber: nextIpcNumber
     });
+    
+   const saved = await newCustomer.save();
 
-    const saved = await newCustomer.save();
+try {
+  await sendJobMail(saved);
+} catch (mailErr) {
+  console.log("Mail error:", mailErr);
+}
 
-    // mail optional
-    // await sendJobMail(saved);
-
-    res.json(saved);
+res.json(saved);
 
   } catch (err) {
     console.log(err);
