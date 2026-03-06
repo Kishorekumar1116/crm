@@ -389,6 +389,7 @@ const {
     
 const invoice = await Invoice.create({
   customerId,
+  gstNumber: customer.gst || "",
   serviceItems,
   subtotal,
   gst,
