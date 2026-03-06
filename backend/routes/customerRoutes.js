@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Customer = require("../models/Customer");
 const { body, validationResult } = require("express-validator");
+const sendJobMail = require("../utils/sendJobMail");
 
 // Utility to ensure always storing key fields
 const sanitizeFields = (data) => {
@@ -21,7 +22,7 @@ router.post("/", async (req, res) => {
     // Generate JOB ID
     const jobId = "JOB-" + Date.now();
 
-    // 🔥 Find last IPC number
+    // Find last IPC number
     const lastCustomer = await Customer.findOne().sort({ ipcNumber: -1 });
 
     let nextIpcNumber = 1;
@@ -37,6 +38,10 @@ router.post("/", async (req, res) => {
     });
 
     const saved = await newCustomer.save();
+
+    // ✅ Send Mail
+    await sendJobMail(saved);
+
     res.json(saved);
 
   } catch (err) {
