@@ -24,16 +24,18 @@ function EditCustomer() {
   });
 
   useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
-        setCustomer(res.data); // assuming API returns a single object
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchCustomer();
-  }, [id]);
+  const fetchCustomer = async () => {
+    try {
+      const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
+      // Check if the API returns res.data.data or just res.data
+      const customerData = res.data.data || res.data;
+      setCustomer(customerData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  fetchCustomer();
+}, [id]);
 
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
