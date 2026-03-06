@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const mailOptions = {
-  from: "yourgmail@gmail.com",
+  from: "ipremiumindia@gmail.com",
   to: data.email,
   subject: "Service Job Created",
 
