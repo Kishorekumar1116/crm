@@ -1,15 +1,18 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Customers() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [editCustomer, setEditCustomer] = useState(null); // currently editing customer
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const res = await axios.get("https://ipremium-crm.onrender.com/api/customers");
+        // ensure data is always an array
         setData(res.data.data || res.data || []);
       } catch (err) {
         console.log(err);
@@ -24,28 +27,6 @@ function Customers() {
       (item.phone || "").includes(search) ||
       (item.productName || "").toLowerCase().includes(search.toLowerCase())
   );
-
-  // Handle input changes in edit form
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditCustomer((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Submit edited customer
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`https://ipremium-crm.onrender.com/api/customers/${editCustomer._id}`, editCustomer);
-      // Update local state to reflect changes
-      setData((prev) =>
-        prev.map((c) => (c._id === editCustomer._id ? editCustomer : c))
-      );
-      setEditCustomer(null); // close modal
-      alert("Customer updated!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update customer");
-    }
-  };
 
   return (
     <div className="container mt-5">
@@ -64,6 +45,7 @@ function Customers() {
           <table className="table table-striped table-hover table-bordered">
             <thead className="table-dark text-center">
               <tr>
+               
                 <th>IPC No</th>
                 <th>Name</th>
                 <th>Phone</th>
@@ -84,9 +66,14 @@ function Customers() {
             </thead>
             <tbody>
               {filteredData.length > 0 ? (
-                filteredData.map((item) => (
+               filteredData.map((item, index) => (
                   <tr key={item._id} className="text-center">
-                    <td>{item.ipcNumber ? `IPC-${String(item.ipcNumber).padStart(3, "0")}` : "—"}</td>
+                    
+<td>
+  {item.ipcNumber
+    ? `IPC-${String(item.ipcNumber).padStart(3, "0")}`
+    : "—"}
+</td>
                     <td>{item.name || "—"}</td>
                     <td>{item.phone || "—"}</td>
                     <td>{item.email || "—"}</td>
@@ -102,30 +89,31 @@ function Customers() {
                     <td>{item.additionalIssues || "—"}</td>
                     <td>{item.technician || "—"}</td>
                     <td>
-  <button
-    className="btn btn-sm btn-success me-1 mb-1"
-    onClick={() => navigate(`/invoice?customerId=${item._id}`)}
-  >
-    Invoice
-  </button>
-  <button
-    className="btn btn-sm btn-warning mb-1"
-    onClick={() => navigate(`/quotation?customerId=${item._id}`)}
-  >
-    Quotation
-  </button>
-  <button
-    className="btn btn-sm btn-primary me-1 mb-1"
-    onClick={() => setEditCustomer(item)}
-  >
-    Edit
-  </button>
-</td>
+                      
+                      <button
+                        className="btn btn-sm btn-success me-1 mb-1"
+                        onClick={() => navigate(`/invoice?customerId=${item._id}`)}
+                      >
+                        Invoice
+                      </button>
+                      <button
+                        className="btn btn-sm btn-warning mb-1"
+                        onClick={() => navigate(`/quotation?customerId=${item._id}`)}
+                      >
+                        Quotation
+                      </button>
+                      <button
+  className="btn btn-sm btn-primary me-1 mb-1"
+  onClick={() => navigate(`/edit-customer/${item._id}`)}
+>
+  Edit
+</button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="16" className="text-center">
+                 <td colSpan="16" className="text-center">
                     No customers found
                   </td>
                 </tr>
@@ -134,43 +122,8 @@ function Customers() {
           </table>
         </div>
       </div>
-
-      {/* Edit Modal */}
-      {editCustomer && (
-        <div className="modal show d-block" tabIndex="-1">
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content p-3">
-              <h5>Edit Customer</h5>
-              <div className="row">
-                {Object.keys(editCustomer).map((key) => (
-                  key !== "_id" && key !== "__v" && (
-                    <div className="col-md-6 mb-2" key={key}>
-                      <label className="form-label">{key}</label>
-                      <input
-                        type="text"
-                        name={key}
-                        className="form-control"
-                        value={editCustomer[key] || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  )
-                ))}
-              </div>
-              <div className="mt-3 text-end">
-                <button className="btn btn-secondary me-2" onClick={() => setEditCustomer(null)}>
-                  Cancel
-                </button>
-                <button className="btn btn-success" onClick={handleUpdate}>
-                  Update
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default Customers;
+export default Customers; 
