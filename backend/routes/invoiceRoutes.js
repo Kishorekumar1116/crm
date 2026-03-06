@@ -108,8 +108,8 @@ doc.text(flattened.name || "");
 doc.text("Bengaluru, Karnataka");
 doc.text("India -");
 
-if (flattened.gst && flattened.gst.trim() !== "") {
-  doc.text(`GST No: ${flattened.gst}`);
+if (flattened.gstNumber && flattened.gstNumber.trim() !== "") {
+  doc.text(`GST No: ${flattened.gstNumber}`);
 }
 
 doc.text(`Phone: ${flattened.phone || ""}`);
