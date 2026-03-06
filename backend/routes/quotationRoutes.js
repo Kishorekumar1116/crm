@@ -6,6 +6,7 @@ const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
 const streamBuffers = require("stream-buffers");
 const path = require("path");
+const mongoose = require("mongoose");
 
 // ==============================
 // EMAIL CONFIG
@@ -84,7 +85,7 @@ const generatePDFContent = (doc, quotation, flattened) => {
     doc.font("Helvetica").text(quotation.notes, { lineGap: 4 });
   }
 
-  doc.end();
+  // doc.end() will be called outside this function
 };
 
 // ==========================
@@ -109,6 +110,7 @@ router.post("/", async (req, res) => {
       const bufferStream = new streamBuffers.WritableStreamBuffer();
       doc.pipe(bufferStream);
       generatePDFContent(doc, quotation, flattened);
+      doc.end(); // END AFTER CONTENT GENERATION
 
       bufferStream.on("finish", async () => {
         try {
@@ -133,6 +135,67 @@ router.post("/", async (req, res) => {
 });
 
 // ==========================
+// VIEW QUOTATION PDF (IMPORTANT: PUT BEFORE /:id)
+// ==========================
+router.get("/view-pdf/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send("Invalid Quotation ID");
+
+    const quotation = await Quotation.findById(req.params.id).populate("customerId");
+    if (!quotation) return res.status(404).send("Quotation not found");
+
+    const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="Quotation-${quotation._id}.pdf"`);
+
+    doc.pipe(res);
+    generatePDFContent(doc, quotation, flattened);
+    doc.end(); // END AFTER PIPE
+  } catch (err) {
+    res.status(500).send("PDF generation error");
+  }
+});
+
+// ==========================
+// SEND QUOTATION PDF VIA EMAIL
+// ==========================
+router.post("/send-email/:id", async (req, res) => {
+  try {
+    const quotation = await Quotation.findById(req.params.id).populate("customerId");
+    if (!quotation || !quotation.customerId?.email) return res.status(404).json({ message: "Customer email not found" });
+
+    const flattened = { ...quotation.toObject(), ...quotation.customerId._doc };
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    const bufferStream = new streamBuffers.WritableStreamBuffer();
+
+    doc.pipe(bufferStream);
+    generatePDFContent(doc, quotation, flattened);
+    doc.end(); // END AFTER CONTENT
+
+    bufferStream.on("finish", async () => {
+      try {
+        const pdfBuffer = bufferStream.getContents();
+        await transporter.sendMail({
+          from: '"iPremium Care" <ipremiumindia@gmail.com>',
+          to: quotation.customerId.email,
+          subject: `Quotation: ${quotation._id}`,
+          text: "Please find attached quotation.",
+          attachments: [{ filename: "Quotation.pdf", content: pdfBuffer }],
+        });
+        res.json({ message: "Email sent successfully" });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ==========================
 // GET ALL QUOTATIONS
 // ==========================
 router.get("/", async (req, res) => {
@@ -150,8 +213,11 @@ router.get("/", async (req, res) => {
 // ==========================
 router.get("/:id", async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send("Invalid Quotation ID");
+
     const quotation = await Quotation.findById(req.params.id).populate("customerId");
     if (!quotation) return res.status(404).json({ message: "Quotation not found" });
+
     const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
     res.json(flattened);
   } catch (err) {
@@ -181,62 +247,6 @@ router.delete("/:id", async (req, res) => {
     const deleted = await Quotation.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Quotation not found" });
     res.json({ message: "Quotation deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// ==========================
-// VIEW QUOTATION PDF
-// ==========================
-router.get("/view-pdf/:id", async (req, res) => {
-  try {
-    const quotation = await Quotation.findById(req.params.id).populate("customerId");
-    if (!quotation) return res.status(404).send("Quotation not found");
-
-    const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
-    const doc = new PDFDocument({ size: "A4", margin: 50 });
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename="Quotation-${quotation._id}.pdf"`);
-    doc.pipe(res);
-
-    generatePDFContent(doc, quotation, flattened);
-  } catch (err) {
-    res.status(500).send("PDF generation error");
-  }
-});
-
-// ==========================
-// SEND QUOTATION PDF VIA EMAIL
-// ==========================
-router.post("/send-email/:id", async (req, res) => {
-  try {
-    const quotation = await Quotation.findById(req.params.id).populate("customerId");
-    if (!quotation || !quotation.customerId?.email) return res.status(404).json({ message: "Customer email not found" });
-
-    const flattened = { ...quotation.toObject(), ...quotation.customerId._doc };
-    const doc = new PDFDocument({ size: "A4", margin: 50 });
-    const bufferStream = new streamBuffers.WritableStreamBuffer();
-
-    doc.pipe(bufferStream);
-    generatePDFContent(doc, quotation, flattened);
-
-    bufferStream.on("finish", async () => {
-      try {
-        const pdfBuffer = bufferStream.getContents();
-        await transporter.sendMail({
-          from: '"iPremium Care" <ipremiumindia@gmail.com>',
-          to: quotation.customerId.email,
-          subject: `Quotation: ${quotation._id}`,
-          text: "Please find attached quotation.",
-          attachments: [{ filename: "Quotation.pdf", content: pdfBuffer }],
-        });
-        res.json({ message: "Email sent successfully" });
-      } catch (err) {
-        res.status(500).json({ error: err.message });
-      }
-    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
