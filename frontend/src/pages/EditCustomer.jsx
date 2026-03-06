@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
 
 function EditCustomer() {
-  const { id } = useParams();
+  const { id } = useParams(); // get customer ID from URL
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    jobId: "",
-    jobDate: "",
-    deliveryDate: "",
-    ipcNumber: "",
+  const [customer, setCustomer] = useState({
     name: "",
     phone: "",
     email: "",
@@ -19,9 +14,6 @@ function EditCustomer() {
     address1: "",
     address2: "",
     city: "",
-    state: "",
-    pincode: "",
-    country: "",
     productName: "",
     brand: "",
     model: "",
@@ -29,185 +21,194 @@ function EditCustomer() {
     issue: "",
     additionalIssues: "",
     technician: "",
-    priority: "",
-    status: "",
+    ipcNumber: "",
   });
 
- useEffect(() => {
-  const fetchCustomer = async () => {
-    try {
-      const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
-      const data = res.data.data || res.data;
-      setForm({
-        ...data,
-        jobDate: data.jobDate?.split("T")[0] || "",
-        deliveryDate: data.deliveryDate?.split("T")[0] || "",
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  fetchCustomer();
-}, [id]);
+  // Fetch customer data on load
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
+        setCustomer(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCustomer();
+  }, [id]);
 
+  // Handle input changes
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setCustomer((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = async () => {
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await axios.put(
-        `https://ipremium-crm.onrender.com/api/customers/${id}`,
-        form
-      );
-   alert("Customer updated locally (simulate backend)");
-    navigate("/customers");
+      await axios.put(`https://ipremium-crm.onrender.com/api/customers/${id}`, customer);
+      alert("Customer updated successfully!");
+      navigate("/customers"); // go back to customer list
     } catch (err) {
-      console.log(err);
-      alert("Update Failed ❌");
+      console.error(err);
+      alert("Failed to update customer");
     }
   };
 
   return (
     <div className="container mt-5">
-      <div className="card shadow-lg p-4">
-        <h3 className="text-center mb-4">✏ Edit Customer</h3>
-
+      <h3 className="mb-4">Edit Customer</h3>
+      <form onSubmit={handleSubmit}>
         <div className="row">
-
-          {/* IPC Number (Readonly Recommended) */}
-          <div className="col-md-4 mb-3">
+          <div className="col-md-6 mb-3">
+            <label>Name</label>
             <input
-              name="ipcNumber"
-              value={form.ipcNumber || ""}
+              type="text"
+              name="name"
               className="form-control"
-              disabled
-            />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input
-              type="date"
-              name="jobDate"
-              value={form.jobDate}
+              value={customer.name}
               onChange={handleChange}
-              className="form-control"
             />
           </div>
 
-          <div className="col-md-4 mb-3">
+          <div className="col-md-6 mb-3">
+            <label>Phone</label>
             <input
-              type="date"
-              name="deliveryDate"
-              value={form.deliveryDate}
-              onChange={handleChange}
+              type="text"
+              name="phone"
               className="form-control"
+              value={customer.phone}
+              onChange={handleChange}
             />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Name" />
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              className="form-control"
+              value={customer.email}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="phone" value={form.phone} onChange={handleChange} className="form-control" placeholder="Phone" />
+            <label>Company</label>
+            <input
+              type="text"
+              name="company"
+              className="form-control"
+              value={customer.company}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="email" value={form.email} onChange={handleChange} className="form-control" placeholder="Email" />
+            <label>GST</label>
+            <input
+              type="text"
+              name="gst"
+              className="form-control"
+              value={customer.gst}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="company" value={form.company} onChange={handleChange} className="form-control" placeholder="Company" />
+            <label>City</label>
+            <input
+              type="text"
+              name="city"
+              className="form-control"
+              value={customer.city}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="gst" value={form.gst} onChange={handleChange} className="form-control" placeholder="GST" />
+            <label>Product Name</label>
+            <input
+              type="text"
+              name="productName"
+              className="form-control"
+              value={customer.productName}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="address1" value={form.address1} onChange={handleChange} className="form-control" placeholder="Address 1" />
+            <label>Brand</label>
+            <input
+              type="text"
+              name="brand"
+              className="form-control"
+              value={customer.brand}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="address2" value={form.address2} onChange={handleChange} className="form-control" placeholder="Address 2" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="City" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="state" value={form.state} onChange={handleChange} className="form-control" placeholder="State" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="pincode" value={form.pincode} onChange={handleChange} className="form-control" placeholder="Pincode" />
+            <label>Model</label>
+            <input
+              type="text"
+              name="model"
+              className="form-control"
+              value={customer.model}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="country" value={form.country} onChange={handleChange} className="form-control" placeholder="Country" />
+            <label>Serial No</label>
+            <input
+              type="text"
+              name="serialNo"
+              className="form-control"
+              value={customer.serialNo}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-12 mb-3">
+            <label>Issue</label>
+            <textarea
+              name="issue"
+              className="form-control"
+              value={customer.issue}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-12 mb-3">
+            <label>Additional Issues</label>
+            <textarea
+              name="additionalIssues"
+              className="form-control"
+              value={customer.additionalIssues}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="col-md-6 mb-3">
-            <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Product Name" />
+            <label>Technician</label>
+            <input
+              type="text"
+              name="technician"
+              className="form-control"
+              value={customer.technician}
+              onChange={handleChange}
+            />
           </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="brand" value={form.brand} onChange={handleChange} className="form-control" placeholder="Brand" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="model" value={form.model} onChange={handleChange} className="form-control" placeholder="Model" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="serialNo" value={form.serialNo} onChange={handleChange} className="form-control" placeholder="Serial No" />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <textarea name="issue" value={form.issue} onChange={handleChange} className="form-control" placeholder="Issue" />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <textarea name="additionalIssues" value={form.additionalIssues} onChange={handleChange} className="form-control" placeholder="Additional Issues" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <input name="technician" value={form.technician} onChange={handleChange} className="form-control" placeholder="Technician" />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <select name="priority" value={form.priority} onChange={handleChange} className="form-select">
-              <option value="">Select Priority</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Urgent">Urgent</option>
-            </select>
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <select name="status" value={form.status} onChange={handleChange} className="form-select">
-              <option value="">Select Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-              <option value="Delivered">Delivered</option>
-            </select>
-          </div>
-
         </div>
 
-        <div className="text-center mt-3">
-          <button className="btn btn-success px-4" onClick={handleUpdate}>
-            Update Customer
-          </button>
-        </div>
-
-      </div>
+        <button type="submit" className="btn btn-primary">
+          Update Customer
+        </button>
+      </form>
     </div>
   );
 }
 
-export default EditCustomer;  
+export default EditCustomer;
