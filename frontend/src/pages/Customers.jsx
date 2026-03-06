@@ -162,7 +162,7 @@ Thank you - iPremium Service Center
                       <button
                         className="btn btn-sm btn-primary me-1 mb-1"
                         onClick={() =>
-                          navigate(`/edit-customer/${item._id}`)
+                     navigate(`/edit-customer/${item._id}`, { state: { customer: item } })
                         }
                       >
                         Edit
