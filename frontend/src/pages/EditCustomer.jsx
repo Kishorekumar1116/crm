@@ -3,26 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function EditCustomer() {
-  const { id } = useParams();
+  const { id } = useParams(); // get customer ID from URL
   const navigate = useNavigate();
-  const [customer, setCustomer] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    company: "",
-    gst: "",
-    address1: "",
-    address2: "",
-    city: "",
-    productName: "",
-    brand: "",
-    model: "",
-    serialNo: "",
-    issue: "",
-    additionalIssues: "",
-    technician: "",
-  });
+  const [customer, setCustomer] = useState(null); // start with null
+  const [loading, setLoading] = useState(true); // for loading state
 
+  // Fetch customer details by ID
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
@@ -31,26 +17,34 @@ function EditCustomer() {
         setCustomer(customerData);
       } catch (err) {
         console.error(err);
+        alert("Failed to fetch customer details");
+      } finally {
+        setLoading(false);
       }
     };
     fetchCustomer();
   }, [id]);
 
+  // Handle input changes
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.put(`https://ipremium-crm.onrender.com/api/customers/${id}`, customer);
-      alert("Customer updated successfully!");
-      navigate("/customers");
+      alert("Customer details updated successfully!");
+      navigate("/customers"); // go back to customer list
     } catch (err) {
       console.error(err);
       alert("Failed to update customer.");
     }
   };
+
+  if (loading) return <div className="container mt-5">Loading customer details...</div>;
+  if (!customer) return <div className="container mt-5">Customer not found!</div>;
 
   return (
     <div className="container mt-5">
@@ -64,7 +58,7 @@ function EditCustomer() {
             <input
               type="text"
               name={key}
-              value={customer[key]}
+              value={customer[key] || ""}
               onChange={handleChange}
               className="form-control"
             />
