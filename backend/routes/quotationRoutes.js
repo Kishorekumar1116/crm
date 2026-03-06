@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "ipremiumindia@gmail.com",
-    pass: "mxwzukcfjefkucbv", // App password
+    pass: "mxwzukcfjefkucbv",
   },
 });
 
@@ -24,10 +24,11 @@ const transporter = nodemailer.createTransport({
 const generatePDFContent = (doc, quotation, flattened) => {
   doc.font("Helvetica");
 
+  // LOGO + TITLE
   const logoPath = path.join(__dirname, "../assets/logo.jpeg");
   doc.image(logoPath, doc.page.width / 2 - 60, 40, { width: 120 });
-
   doc.moveDown(3);
+
   doc.fontSize(15).font("Helvetica-Bold").text("QUOTATION", { align: "center" });
   doc.moveDown(2);
 
@@ -37,20 +38,14 @@ const generatePDFContent = (doc, quotation, flattened) => {
   doc.text(flattened.name || "");
   doc.text(flattened.company || "");
   doc.text(`${flattened.city || ""}, ${flattened.state || ""}`);
-  if (flattened.gst && flattened.gst.trim() !== "") {
-    doc.text(`GST No: ${flattened.gst}`);
-  }
+  if (flattened.gst && flattened.gst.trim() !== "") doc.text(`GST No: ${flattened.gst}`);
   doc.text(`Phone: ${flattened.phone || ""}`);
   doc.text(`Email: ${flattened.email || ""}`);
-
   doc.moveDown(2);
 
   // TABLE HEADER
   const tableTop = doc.y;
-  const itemX = 50;
-  const priceX = 330;
-  const qtyX = 410;
-  const amountX = 470;
+  const itemX = 50, priceX = 330, qtyX = 410, amountX = 470;
 
   doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
   doc.font("Helvetica-Bold");
@@ -66,7 +61,6 @@ const generatePDFContent = (doc, quotation, flattened) => {
   const price = Number(quotation.amount || 0);
   const qty = 1;
   const total = price * qty;
-
   const description = `${quotation.productName || ""} - ${quotation.issue || ""}\nModel: ${quotation.model || ""} | Serial: ${quotation.serialNo || ""}`;
   const rowTop = doc.y;
   doc.text(description, itemX, rowTop, { width: 260 });
@@ -105,7 +99,7 @@ router.post("/", async (req, res) => {
     if (!customer) return res.status(404).json({ message: "Customer not found" });
 
     const quotation = await Quotation.create({ customerId, amount, notes, status, productName, model, serialNo, issue });
-    await quotation.populate("customerId", "name phone email company gst address1 address2 city state pincode country");
+    await quotation.populate("customerId");
 
     const flattened = { ...quotation.toObject(), ...customer._doc };
 
@@ -193,7 +187,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // ==========================
-// VIEW PDF
+// VIEW QUOTATION PDF
 // ==========================
 router.get("/view-pdf/:id", async (req, res) => {
   try {
@@ -204,7 +198,9 @@ router.get("/view-pdf/:id", async (req, res) => {
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
     res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="Quotation-${quotation._id}.pdf"`);
     doc.pipe(res);
+
     generatePDFContent(doc, quotation, flattened);
   } catch (err) {
     res.status(500).send("PDF generation error");
@@ -212,7 +208,7 @@ router.get("/view-pdf/:id", async (req, res) => {
 });
 
 // ==========================
-// SEND EMAIL WITH PDF
+// SEND QUOTATION PDF VIA EMAIL
 // ==========================
 router.post("/send-email/:id", async (req, res) => {
   try {
