@@ -1,6 +1,8 @@
 const nodemailer = require("nodemailer");
 
 const sendJobMail = async (data) => {
+  
+   console.log("Sending mail to:", data.email);
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
