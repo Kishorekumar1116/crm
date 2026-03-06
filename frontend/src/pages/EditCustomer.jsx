@@ -24,18 +24,17 @@ function EditCustomer() {
   });
 
   useEffect(() => {
-  const fetchCustomer = async () => {
-    try {
-      const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
-      // Check if the API returns res.data.data or just res.data
-      const customerData = res.data.data || res.data;
-      setCustomer(customerData);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  fetchCustomer();
-}, [id]);
+    const fetchCustomer = async () => {
+      try {
+        const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
+        const customerData = res.data.data || res.data;
+        setCustomer(customerData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCustomer();
+  }, [id]);
 
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
@@ -45,9 +44,11 @@ function EditCustomer() {
     e.preventDefault();
     try {
       await axios.put(`https://ipremium-crm.onrender.com/api/customers/${id}`, customer);
+      alert("Customer updated successfully!");
       navigate("/customers");
     } catch (err) {
       console.error(err);
+      alert("Failed to update customer.");
     }
   };
 
@@ -57,7 +58,9 @@ function EditCustomer() {
       <form onSubmit={handleSubmit}>
         {Object.keys(customer).map((key) => (
           <div className="mb-3" key={key}>
-            <label className="form-label text-capitalize">{key.replace(/([A-Z])/g, " $1")}</label>
+            <label className="form-label text-capitalize">
+              {key.replace(/([A-Z])/g, " $1")}
+            </label>
             <input
               type="text"
               name={key}
