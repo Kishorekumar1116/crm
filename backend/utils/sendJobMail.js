@@ -5,8 +5,8 @@ const sendJobMail = async (data) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "yourgmail@gmail.com",
-    pass: "your_app_password"
+    user: "ipremiumindia@gmail.com",
+    pass: "mxwzukcfjefkucbv",
   }
 });
 
