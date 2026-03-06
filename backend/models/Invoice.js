@@ -7,6 +7,11 @@ const invoiceSchema = new mongoose.Schema(
       ref: "Customer",
       required: true,
     },
+      gstNumber: {
+    type: String,
+    default: ""
+  },
+
 
     serviceItems: [
       {
