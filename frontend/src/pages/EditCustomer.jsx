@@ -33,22 +33,39 @@ function EditCustomer() {
     status: "",
   });
 
- useEffect(() => {
-  const fetchCustomer = async () => {
-    try {
-      const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
-      const data = res.data.data || res.data;
-      setForm({
-        ...data,
-        jobDate: data.jobDate?.split("T")[0] || "",
-        deliveryDate: data.deliveryDate?.split("T")[0] || "",
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  fetchCustomer();
-}, [id]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  // Fetch customer on mount
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const res = await axios.get(
+          `https://ipremium-crm.onrender.com/api/customers/${id}`
+        );
+
+        if (!res.data || Object.keys(res.data).length === 0) {
+          setError(true);
+          return;
+        }
+
+        const data = res.data.data || res.data;
+
+        setForm({
+          ...data,
+          jobDate: data.jobDate?.split("T")[0] || "",
+          deliveryDate: data.deliveryDate?.split("T")[0] || "",
+        });
+      } catch (err) {
+        console.log("Error fetching customer:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomer();
+  }, [id]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -60,22 +77,24 @@ function EditCustomer() {
         `https://ipremium-crm.onrender.com/api/customers/${id}`,
         form
       );
-   alert("Customer updated locally (simulate backend)");
-    navigate("/customers");
+      alert("Customer updated successfully ✅");
+      navigate("/customers");
     } catch (err) {
-      console.log(err);
-      alert("Update Failed ❌");
+      console.log("Update failed:", err);
+      alert("Update failed ❌");
     }
   };
+
+  if (loading) return <div className="container mt-5">Loading customer...</div>;
+  if (error) return <div className="container mt-5">Customer not found!</div>;
 
   return (
     <div className="container mt-5">
       <div className="card shadow-lg p-4">
         <h3 className="text-center mb-4">✏ Edit Customer</h3>
-
         <div className="row">
 
-          {/* IPC Number (Readonly Recommended) */}
+          {/* IPC Number (readonly) */}
           <div className="col-md-4 mb-3">
             <input
               name="ipcNumber"
@@ -85,6 +104,7 @@ function EditCustomer() {
             />
           </div>
 
+          {/* Job Date */}
           <div className="col-md-4 mb-3">
             <input
               type="date"
@@ -95,6 +115,7 @@ function EditCustomer() {
             />
           </div>
 
+          {/* Delivery Date */}
           <div className="col-md-4 mb-3">
             <input
               type="date"
@@ -105,78 +126,67 @@ function EditCustomer() {
             />
           </div>
 
+          {/* Customer Details */}
           <div className="col-md-6 mb-3">
             <input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Name" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="phone" value={form.phone} onChange={handleChange} className="form-control" placeholder="Phone" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="email" value={form.email} onChange={handleChange} className="form-control" placeholder="Email" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="company" value={form.company} onChange={handleChange} className="form-control" placeholder="Company" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="gst" value={form.gst} onChange={handleChange} className="form-control" placeholder="GST" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="address1" value={form.address1} onChange={handleChange} className="form-control" placeholder="Address 1" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="address2" value={form.address2} onChange={handleChange} className="form-control" placeholder="Address 2" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="City" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="state" value={form.state} onChange={handleChange} className="form-control" placeholder="State" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="pincode" value={form.pincode} onChange={handleChange} className="form-control" placeholder="Pincode" />
           </div>
-
           <div className="col-md-6 mb-3">
             <input name="country" value={form.country} onChange={handleChange} className="form-control" placeholder="Country" />
           </div>
 
+          {/* Product Details */}
           <div className="col-md-6 mb-3">
             <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Product Name" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="brand" value={form.brand} onChange={handleChange} className="form-control" placeholder="Brand" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="model" value={form.model} onChange={handleChange} className="form-control" placeholder="Model" />
           </div>
-
           <div className="col-md-4 mb-3">
             <input name="serialNo" value={form.serialNo} onChange={handleChange} className="form-control" placeholder="Serial No" />
           </div>
 
+          {/* Issues */}
           <div className="col-md-6 mb-3">
             <textarea name="issue" value={form.issue} onChange={handleChange} className="form-control" placeholder="Issue" />
           </div>
-
           <div className="col-md-6 mb-3">
             <textarea name="additionalIssues" value={form.additionalIssues} onChange={handleChange} className="form-control" placeholder="Additional Issues" />
           </div>
 
+          {/* Technician & Status */}
           <div className="col-md-4 mb-3">
             <input name="technician" value={form.technician} onChange={handleChange} className="form-control" placeholder="Technician" />
           </div>
-
           <div className="col-md-4 mb-3">
             <select name="priority" value={form.priority} onChange={handleChange} className="form-select">
               <option value="">Select Priority</option>
@@ -186,7 +196,6 @@ function EditCustomer() {
               <option value="Urgent">Urgent</option>
             </select>
           </div>
-
           <div className="col-md-4 mb-3">
             <select name="status" value={form.status} onChange={handleChange} className="form-select">
               <option value="">Select Status</option>
@@ -200,11 +209,10 @@ function EditCustomer() {
         </div>
 
         <div className="text-center mt-3">
-          <button className="btn btn-success px-4" onClick={handleUpdate}>
+          <button className="btn btn-success px-4" onClick={handleUpdate} disabled={!form._id}>
             Update Customer
           </button>
         </div>
-
       </div>
     </div>
   );
