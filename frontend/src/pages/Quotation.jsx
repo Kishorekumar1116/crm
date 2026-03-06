@@ -15,7 +15,21 @@ function Quotation() {
   const queryParams = new URLSearchParams(location.search);
   const prefillCustomerId = queryParams.get("customerId") || "";
 
-  // Fetch all customers
+  // Fixed Company Info (FROM)
+  const company = {
+    name: "iPremium India - HSR Layout",
+    address1: "114-115, 80 ft road, 27th Main Rd, 2nd Sector",
+    area: "HSR Layout",
+    city: "Bengaluru",
+    state: "Karnataka",
+    pincode: "560102",
+    country: "India",
+    phone: "8884417766",
+    email: "support@ipremiumindia.co.in",
+    gst: "29AAKFI8994H1ZH",
+  };
+
+  // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -31,25 +45,23 @@ function Quotation() {
     fetchCustomers();
   }, [prefillCustomerId]);
 
-  // Set selected customer data
+  // Fetch selected customer data
   useEffect(() => {
     if (!selected) {
       setCustomerData({});
       return;
     }
 
-    const fetchCustomerJob = async () => {
+    const fetchCustomerData = async () => {
       try {
-        // Get latest quotation/job data for selected customer
-        const res = await axios.get(`http://localhost:5000/api/quotations/latest/${selected}`);
-        setCustomerData(res.data.customerJob || {});
+        const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${selected}`);
+        setCustomerData(res.data || {});
       } catch (err) {
         console.error(err);
         setCustomerData({});
       }
     };
-
-    fetchCustomerJob();
+    fetchCustomerData();
   }, [selected]);
 
   const createQuotation = async () => {
@@ -60,14 +72,14 @@ function Quotation() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/quotations", {
+      await axios.post("https://ipremium-crm.onrender.com/api/quotations", {
         customerId: selected,
         amount,
         notes,
-        productName: customerData.productName,
-        model: customerData.model,
-        serialNo: customerData.serialNo,
-        issue: customerData.issue
+        productName: customerData.latestProduct || "",
+        model: customerData.latestModel || "",
+        serialNo: customerData.latestSerial || "",
+        issue: customerData.latestIssue || "",
       });
 
       setSuccess("Quotation Created Successfully ✅");
@@ -91,7 +103,7 @@ function Quotation() {
             <div className="p-4 text-white d-flex justify-content-between align-items-center"
                  style={{ background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)" }}>
               <div>
-                <h2 className="fw-bold mb-0">iPemium Care Quotation </h2>
+                <h2 className="fw-bold mb-0">iPremium Care Quotation</h2>
                 <small className="opacity-75">Professional Quotation System</small>
               </div>
               <div className="text-end">
@@ -122,18 +134,19 @@ function Quotation() {
               </div>
 
               <div className="row g-4 mb-4">
-                {/* Shop Details */}
+                {/* FROM */}
                 <div className="col-md-6">
                   <div className="p-4 bg-white rounded-4 shadow-sm border-top border-primary border-4 h-100">
                     <h6 className="text-primary fw-bold mb-3">FROM:</h6>
-                    <h5 className="fw-bold">CRM Pro Enterprise</h5>
-                    <p className="small mb-1 text-muted">📍 123 Business Street, City</p>
-                    <p className="small mb-1 text-muted">🆔 GST: 12ABCDE3456F7Z8</p>
-                    <p className="small mb-0 text-muted">📞 +91 9876543210</p>
+                    <h5 className="fw-bold">{company.name}</h5>
+                    <p className="small mb-1 text-muted">📍 {company.address1}, {company.city}</p>
+                    <p className="small mb-1 text-muted">🆔 GST: {company.gst}</p>
+                    <p className="small mb-0 text-muted">📞 {company.phone}</p>
+                    <p className="small mb-0 text-muted">📧 {company.email}</p>
                   </div>
                 </div>
 
-                {/* Customer Details */}
+                {/* TO */}
                 <div className="col-md-6">
                   <div className="p-4 bg-white rounded-4 shadow-sm border-top border-info border-4 h-100">
                     <h6 className="text-info fw-bold mb-3">BILL TO:</h6>
@@ -150,17 +163,17 @@ function Quotation() {
               <div className="bg-white rounded-4 shadow-sm overflow-hidden mb-4">
                 <div className="bg-dark text-white p-3 fw-bold">Service & Job Details</div>
                 <div className="p-4">
-                  {customerData?.productName ? (
+                  {customerData?.latestProduct ? (
                     <div className="row">
                       <div className="col-md-8">
-                        <h6 className="fw-bold text-primary">{customerData.productName}</h6>
+                        <h6 className="fw-bold text-primary">{customerData.latestProduct}</h6>
                         <div className="d-flex gap-2 mb-3">
-                          <span className="badge bg-light text-dark border">Model: {customerData.model || "-"}</span>
-                          <span className="badge bg-light text-dark border">SN: {customerData.serialNo || "-"}</span>
+                          <span className="badge bg-light text-dark border">Model: {customerData.latestModel || "-"}</span>
+                          <span className="badge bg-light text-dark border">SN: {customerData.latestSerial || "-"}</span>
                         </div>
                         <div className="p-3 bg-warning bg-opacity-10 border-start border-warning border-4 rounded">
                           <strong className="small text-uppercase text-warning d-block">Reported Issue:</strong>
-                          <span>{customerData.issue || "No issue recorded"}</span>
+                          <span>{customerData.latestIssue || "No issue recorded"}</span>
                         </div>
                       </div>
                       <div className="col-md-4 text-end">
