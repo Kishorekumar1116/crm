@@ -42,15 +42,39 @@ function QuotationList() {
     }
   };
 
+  const editQuotation = (quotationId) => {
+    navigate(`/quotation/edit/${quotationId}`);
+  };
+
+  const deleteQuotation = async (quotationId) => {
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this quotation?");
+      if (!confirmDelete) return;
+
+      await axios.delete(`https://ipremium-crm.onrender.com/api/quotations/${quotationId}`);
+      alert("Quotation deleted successfully");
+      fetchQuotations();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to delete quotation");
+    }
+  };
+
   const filteredQuotations = quotations.filter((quo) => {
     const name = quo.customerId?.name?.toLowerCase() || quo.name?.toLowerCase() || "";
     const phone = quo.customerId?.phone || quo.phone || "";
-    return name.includes(searchTerm.toLowerCase()) || phone.includes(searchTerm.toLowerCase());
+    const product = quo.productName?.toLowerCase() || "";
+    const model = quo.model?.toLowerCase() || "";
+    return (
+      name.includes(searchTerm.toLowerCase()) ||
+      phone.includes(searchTerm.toLowerCase()) ||
+      product.includes(searchTerm.toLowerCase()) ||
+      model.includes(searchTerm.toLowerCase())
+    );
   });
 
   return (
     <div className="container py-5">
-
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -84,7 +108,7 @@ function QuotationList() {
             <input
               type="text"
               className="form-control border-0"
-              placeholder="Search by Customer Name or Phone Number..."
+              placeholder="Search by Customer, Phone, Product, or Model..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -92,7 +116,7 @@ function QuotationList() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* QUOTATION TABLE */}
       <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
         <div className="table-responsive">
           <table className="table table-hover align-middle mb-0">
@@ -117,35 +141,24 @@ function QuotationList() {
                 </tr>
               ) : filteredQuotations.length > 0 ? (
                 filteredQuotations.map((quo) => (
-                  <tr key={quo._id}>
-                    <td className="ps-4">
-                      {new Date(quo.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="fw-bold">
-                      {quo.customerId?.name || quo.name || "N/A"}
-                    </td>
-                    <td>
-                      {quo.customerId?.phone || quo.phone || "N/A"}
-                    </td>
-                    <td className="text-warning fw-bold">
-                      ₹{quo.amount}
-                    </td>
+                  <tr key={quo._id} 
+                      className="align-middle"
+                      style={{ transition: "0.3s" }}
+                      onMouseOver={e => e.currentTarget.style.backgroundColor = "rgba(255, 152, 102, 0.1)"}
+                      onMouseOut={e => e.currentTarget.style.backgroundColor = "transparent"}
+                  >
+                    <td className="ps-4">{new Date(quo.createdAt).toLocaleDateString()}</td>
+                    <td className="fw-bold">{quo.customerId?.name || quo.name || "N/A"}</td>
+                    <td>{quo.customerId?.phone || quo.phone || "N/A"}</td>
+                    <td className="text-warning fw-bold">₹{quo.amount}</td>
                     <td>{quo.productName || "-"}</td>
                     <td>{quo.model || "-"}</td>
                     <td>{quo.notes || "-"}</td>
                     <td className="text-center">
-                      <button 
-                        onClick={() => viewPdf(quo._id)} 
-                        className="btn btn-sm btn-warning mx-1"
-                      >
-                        View PDF
-                      </button>
-                      <button 
-                        onClick={() => sendEmail(quo._id)} 
-                        className="btn btn-sm btn-dark mx-1"
-                      >
-                        📩 Send Email
-                      </button>
+                      <button onClick={() => viewPdf(quo._id)} className="btn btn-sm btn-warning mx-1">View PDF</button>
+                      <button onClick={() => sendEmail(quo._id)} className="btn btn-sm btn-dark mx-1">📩 Send Email</button>
+                      <button onClick={() => editQuotation(quo._id)} className="btn btn-sm btn-info mx-1">✏️ Edit</button>
+                      <button onClick={() => deleteQuotation(quo._id)} className="btn btn-sm btn-danger mx-1">🗑 Delete</button>
                     </td>
                   </tr>
                 ))
