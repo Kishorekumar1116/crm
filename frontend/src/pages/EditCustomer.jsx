@@ -65,9 +65,8 @@ function EditCustomer() {
         `https://ipremium-crm.onrender.com/api/customers/${id}`,
         form
       );
-
-      alert("Customer Updated Successfully ✅");
-      navigate("/customers");
+   alert("Customer updated locally (simulate backend)");
+    navigate("/customers");
     } catch (err) {
       console.log(err);
       alert("Update Failed ❌");
