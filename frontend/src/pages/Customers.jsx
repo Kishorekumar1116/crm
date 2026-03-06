@@ -28,7 +28,7 @@ function Customers() {
 
  const sendJobSheet = (customer) => {
   const message = `
-📄 Job Sheet Details
+📄 iPremium Care Job Sheet Details
 
 IPC No: ${customer.ipcNumber ? `IPC-${String(customer.ipcNumber).padStart(3, "0")}` : "—"}
 Name: ${customer.name || "—"}
