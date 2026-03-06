@@ -33,25 +33,22 @@ function EditCustomer() {
     status: "",
   });
 
-  useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const res =await axios.put(`https://ipremium-crm.onrender.com/api/customers/${id}`, form);
-
-        const data = res.data.data || res.data;
-
-        setForm({
-          ...data,
-          jobDate: data.jobDate?.split("T")[0] || "",
-          deliveryDate: data.deliveryDate?.split("T")[0] || "",
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchCustomer();
-  }, [id]);
+ useEffect(() => {
+  const fetchCustomer = async () => {
+    try {
+      const res = await axios.get(`https://ipremium-crm.onrender.com/api/customers/${id}`);
+      const data = res.data.data || res.data;
+      setForm({
+        ...data,
+        jobDate: data.jobDate?.split("T")[0] || "",
+        deliveryDate: data.deliveryDate?.split("T")[0] || "",
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  fetchCustomer();
+}, [id]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
