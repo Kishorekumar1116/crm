@@ -299,7 +299,7 @@ if (serviceItems.length === 0) {
   {/* Subtotal */}
   <div className="mb-2">
     <small className="text-muted">Subtotal:</small>
-    <h6>₹ {subtotal.toFixed(2)}</h6>
+    <h6>₹ {subtotal.toLocaleString("en-IN")}</h6>
   </div>
 
   {/* GST Checkbox */}
@@ -320,7 +320,7 @@ if (serviceItems.length === 0) {
   {includeGST && (
     <div className="mb-2">
       <small className="text-muted">GST (18%):</small>
-      <h6>₹ {gstAmount.toFixed(2)}</h6>
+      <h6>₹ {gstAmount.toLocaleString("en-IN")}</h6>
     </div>
   )}
 
@@ -336,7 +336,7 @@ if (serviceItems.length === 0) {
 <div className="mt-2 text-end">
   <small className="text-muted">Balance Due:</small>
   <h6 className="text-danger fw-bold">
-    ₹ {(finalAmount - Number(amountPaid || 0)).toFixed(2)}
+    ₹ {(finalAmount - Number(amountPaid || 0)).toLocaleString("en-IN")}
   </h6>
 </div>
   {/* Final Amount */}
@@ -345,7 +345,7 @@ if (serviceItems.length === 0) {
     <input
       type="number"
       className="form-control form-control-lg text-end fw-bold"
-      value={finalAmount.toFixed(2)}
+     value={Number(finalAmount).toLocaleString("en-IN")}
       readOnly
     />
   </div>
