@@ -159,9 +159,9 @@ Thank you - iPremium Service Center
                         Quotation
                       </button>
 
-                      <button
+                   <button
   className="btn btn-sm btn-primary me-1 mb-1"
-  onClick={() => navigate(`/edit-customer/${item._id}`, { state: { customer: item } })}
+  onClick={() => navigate(`/edit-customer/${item._id}`)}
 >
   Edit
 </button>
