@@ -6,16 +6,17 @@ function EditInvoice() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    amount: "",
-    productName: "",
-    model: "",
-    serialNo: "",
-    issue: "",
-    notes: "",
-  });
+const [formData, setFormData] = useState({
+  name: "",
+  phone: "",
+  amount: "",
+  productName: "",
+  model: "",
+  serialNo: "",
+  issue: "",
+  notes: "",
+  gstNumber: ""
+});
 
   useEffect(() => {
     fetchInvoice();
@@ -27,16 +28,17 @@ function EditInvoice() {
         `https://ipremium-crm.onrender.com/api/invoices/${id}`
       );
 
-      setFormData({
-        name: res.data.name || "",
-        phone: res.data.phone || "",
-        amount: res.data.amount || "",
-        productName: res.data.productName || "",
-        model: res.data.model || "",
-        serialNo: res.data.serialNo || "",
-        issue: res.data.issue || "",
-        notes: res.data.notes || "",
-      });
+   setFormData({
+  name: res.data.name || "",
+  phone: res.data.phone || "",
+  amount: res.data.amount || "",
+  productName: res.data.productName || "",
+  model: res.data.model || "",
+  serialNo: res.data.serialNo || "",
+  issue: res.data.issue || "",
+  notes: res.data.notes || "",
+  gstNumber: res.data.gstNumber || ""
+});
 
     } catch (err) {
       console.log(err);
@@ -124,6 +126,26 @@ return (
               <label className="text-light">{field.label}</label>
             </div>
           ))}
+
+
+          
+          <div className="form-floating mb-3">
+  <input
+    type="text"
+    name="gstNumber"
+    value={formData.gstNumber}
+    onChange={handleChange}
+    className="form-control rounded-4 border-0"
+    placeholder="GST Number"
+    style={{
+      background: "rgba(255,255,255,0.15)",
+      color: "#fff",
+    }}
+  />
+  <label className="text-light">GST Number</label>
+</div>
+
+          
 
           <div className="form-floating mb-4">
             <textarea
