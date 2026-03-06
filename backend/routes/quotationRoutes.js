@@ -46,7 +46,10 @@ const generatePDFContent = (doc, quotation, flattened) => {
 
   // TABLE HEADER
   const tableTop = doc.y;
-  const itemX = 50, priceX = 330, qtyX = 410, amountX = 470;
+  const itemX = 50,
+    priceX = 330,
+    qtyX = 410,
+    amountX = 470;
 
   doc.moveTo(itemX, tableTop - 5).lineTo(550, tableTop - 5).stroke();
   doc.font("Helvetica-Bold");
@@ -57,26 +60,45 @@ const generatePDFContent = (doc, quotation, flattened) => {
   doc.moveTo(itemX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
   doc.moveDown(1.5);
 
-  // TABLE ROWS
+  // TABLE ROWS (support multiple serviceItems if available)
   doc.font("Helvetica");
-  const price = Number(quotation.amount || 0);
-  const qty = 1;
-  const total = price * qty;
-  const description = `${quotation.productName || ""} - ${quotation.issue || ""}\nModel: ${quotation.model || ""} | Serial: ${quotation.serialNo || ""}`;
-  const rowTop = doc.y;
-  doc.text(description, itemX, rowTop, { width: 260 });
-  const descriptionHeight = doc.heightOfString(description, { width: 260 });
-  doc.text(price.toFixed(2), priceX, rowTop, { width: 60, align: "right" });
-  doc.text(qty, qtyX, rowTop, { width: 40, align: "right" });
-  doc.text(total.toFixed(2), amountX, rowTop, { width: 80, align: "right" });
-  doc.y = rowTop + descriptionHeight + 10;
-  doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown(1);
+  if (quotation.serviceItems && quotation.serviceItems.length > 0) {
+    quotation.serviceItems.forEach((item) => {
+      const price = Number(item.amount || 0);
+      const qty = 1;
+      const total = price * qty;
+      const description = `${item.productName || ""} - ${item.issue || ""}\nModel: ${item.model || ""} | Serial: ${item.serialNo || ""}`;
+      const rowTop = doc.y;
+      doc.text(description, itemX, rowTop, { width: 260 });
+      const descriptionHeight = doc.heightOfString(description, { width: 260 });
+      doc.text(price.toFixed(2), priceX, rowTop, { width: 60, align: "right" });
+      doc.text(qty, qtyX, rowTop, { width: 40, align: "right" });
+      doc.text(total.toFixed(2), amountX, rowTop, { width: 80, align: "right" });
+      doc.y = rowTop + descriptionHeight + 10;
+      doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
+      doc.moveDown(1);
+    });
+  } else {
+    // fallback to single productName/amount
+    const price = Number(quotation.amount || 0);
+    const qty = 1;
+    const total = price * qty;
+    const description = `${quotation.productName || ""} - ${quotation.issue || ""}\nModel: ${quotation.model || ""} | Serial: ${quotation.serialNo || ""}`;
+    const rowTop = doc.y;
+    doc.text(description, itemX, rowTop, { width: 260 });
+    const descriptionHeight = doc.heightOfString(description, { width: 260 });
+    doc.text(price.toFixed(2), priceX, rowTop, { width: 60, align: "right" });
+    doc.text(qty, qtyX, rowTop, { width: 40, align: "right" });
+    doc.text(total.toFixed(2), amountX, rowTop, { width: 80, align: "right" });
+    doc.y = rowTop + descriptionHeight + 10;
+    doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(1);
+  }
 
   // TOTAL AMOUNT
   doc.font("Helvetica-Bold");
   doc.text("Total Amount", 360, doc.y);
-  doc.text(total.toFixed(2), 460, doc.y, { width: 80, align: "right" });
+  doc.text((quotation.subtotal || quotation.amount || 0).toFixed(2), 460, doc.y, { width: 80, align: "right" });
   doc.moveDown(2);
 
   // NOTES
@@ -84,8 +106,7 @@ const generatePDFContent = (doc, quotation, flattened) => {
     doc.font("Helvetica-Bold").text("Additional Notes", 50);
     doc.font("Helvetica").text(quotation.notes, { lineGap: 4 });
   }
-
-  // doc.end() will be called outside this function
+  // Do NOT call doc.end() here, will be called in route
 };
 
 // ==========================
@@ -93,13 +114,13 @@ const generatePDFContent = (doc, quotation, flattened) => {
 // ==========================
 router.post("/", async (req, res) => {
   try {
-    const { customerId, amount, notes, status, productName, model, serialNo, issue } = req.body;
+    const { customerId, amount, notes, status, serviceItems, productName, model, serialNo, issue } = req.body;
     if (!customerId || !amount) return res.status(400).json({ message: "Customer and Amount required" });
 
     const customer = await Customer.findById(customerId);
     if (!customer) return res.status(404).json({ message: "Customer not found" });
 
-    const quotation = await Quotation.create({ customerId, amount, notes, status, productName, model, serialNo, issue });
+    const quotation = await Quotation.create({ customerId, amount, notes, status, serviceItems, productName, model, serialNo, issue });
     await quotation.populate("customerId");
 
     const flattened = { ...quotation.toObject(), ...customer._doc };
@@ -110,7 +131,7 @@ router.post("/", async (req, res) => {
       const bufferStream = new streamBuffers.WritableStreamBuffer();
       doc.pipe(bufferStream);
       generatePDFContent(doc, quotation, flattened);
-      doc.end(); // END AFTER CONTENT GENERATION
+      doc.end();
 
       bufferStream.on("finish", async () => {
         try {
@@ -135,13 +156,14 @@ router.post("/", async (req, res) => {
 });
 
 // ==========================
-// VIEW QUOTATION PDF (IMPORTANT: PUT BEFORE /:id)
+// VIEW QUOTATION PDF
 // ==========================
 router.get("/view-pdf/:id", async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send("Invalid Quotation ID");
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send("Invalid Quotation ID");
 
-    const quotation = await Quotation.findById(req.params.id).populate("customerId");
+    const quotation = await Quotation.findById(id).populate("customerId");
     if (!quotation) return res.status(404).send("Quotation not found");
 
     const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
@@ -152,7 +174,7 @@ router.get("/view-pdf/:id", async (req, res) => {
 
     doc.pipe(res);
     generatePDFContent(doc, quotation, flattened);
-    doc.end(); // END AFTER PIPE
+    doc.end();
   } catch (err) {
     res.status(500).send("PDF generation error");
   }
@@ -163,7 +185,8 @@ router.get("/view-pdf/:id", async (req, res) => {
 // ==========================
 router.post("/send-email/:id", async (req, res) => {
   try {
-    const quotation = await Quotation.findById(req.params.id).populate("customerId");
+    const { id } = req.params;
+    const quotation = await Quotation.findById(id).populate("customerId");
     if (!quotation || !quotation.customerId?.email) return res.status(404).json({ message: "Customer email not found" });
 
     const flattened = { ...quotation.toObject(), ...quotation.customerId._doc };
@@ -173,7 +196,7 @@ router.post("/send-email/:id", async (req, res) => {
 
     doc.pipe(bufferStream);
     generatePDFContent(doc, quotation, flattened);
-    doc.end(); // END AFTER CONTENT
+    doc.end();
 
     bufferStream.on("finish", async () => {
       try {
@@ -201,7 +224,7 @@ router.post("/send-email/:id", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const quotations = await Quotation.find().populate("customerId").sort({ createdAt: -1 });
-    const flattened = quotations.map(q => ({ ...q.toObject(), ...q.customerId?._doc }));
+    const flattened = quotations.map((q) => ({ ...q.toObject(), ...q.customerId?._doc }));
     res.json(flattened);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -213,9 +236,10 @@ router.get("/", async (req, res) => {
 // ==========================
 router.get("/:id", async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send("Invalid Quotation ID");
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send("Invalid Quotation ID");
 
-    const quotation = await Quotation.findById(req.params.id).populate("customerId");
+    const quotation = await Quotation.findById(id).populate("customerId");
     if (!quotation) return res.status(404).json({ message: "Quotation not found" });
 
     const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
