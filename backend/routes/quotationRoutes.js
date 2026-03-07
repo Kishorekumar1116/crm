@@ -161,16 +161,24 @@ router.post("/", async (req, res) => {
 router.get("/view-pdf/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send("Invalid Quotation ID");
+
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).send("Invalid Quotation ID");
 
     const quotation = await Quotation.findById(id).populate("customerId");
-    if (!quotation) return res.status(404).send("Quotation not found");
+
+    if (!quotation)
+      return res.status(404).send("Quotation not found");
 
     const flattened = { ...quotation.toObject(), ...quotation.customerId?._doc };
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
+
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename="Quotation-${quotation._id}.pdf"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="Quotation-${quotation._id}.pdf"`
+    );
 
     doc.pipe(res);
     generatePDFContent(doc, quotation, flattened);
