@@ -120,7 +120,13 @@ router.post("/", async (req, res) => {
     const customer = await Customer.findById(customerId);
     if (!customer) return res.status(404).json({ message: "Customer not found" });
 
-    const quotation = await Quotation.create({ customerId, amount, notes, status, serviceItems, productName, model, serialNo, issue });
+    const quotation = await Quotation.create({
+  customerId,
+  amount,
+  notes,
+  status,
+  serviceItems
+});
     await quotation.populate("customerId");
 
     const flattened = { ...quotation.toObject(), ...customer._doc };
