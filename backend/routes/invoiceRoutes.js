@@ -550,8 +550,17 @@ router.get("/", async (req, res) => {
 // new
 router.get("/:id", async (req, res) => {
   try {
-    const invoice = await Invoice.findById(req.params.id);
-    res.json(invoice);
+
+    const invoice = await Invoice.findById(req.params.id)
+      .populate("customerId");
+
+    res.json({
+      ...invoice.toObject(),
+      name: invoice.customerId?.name,
+      phone: invoice.customerId?.phone,
+      email: invoice.customerId?.email
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error fetching invoice" });
   }
@@ -559,13 +568,32 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    const invoice = await Invoice.findById(req.params.id);
+
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found" });
+    }
+
+    // update invoice
+    invoice.amount = req.body.amount;
+    invoice.notes = req.body.notes;
+    invoice.gstNumber = req.body.gstNumber;
+
+    await invoice.save();
+
+    // update customer
+    await Customer.findByIdAndUpdate(invoice.customerId, {
+      name: req.body.name,
+      phone: req.body.phone
+    });
+
     res.json({ message: "Invoice updated successfully" });
+
   } catch (err) {
     res.status(500).json({ message: "Update failed" });
   }
 });
-
 // ==============================
 // DELETE
 // ==============================
