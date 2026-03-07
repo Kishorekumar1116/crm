@@ -114,7 +114,7 @@ const generatePDFContent = (doc, quotation, flattened) => {
 // ==========================
 router.post("/", async (req, res) => {
   try {
-    const { customerId, amount, notes, status, serviceItems, productName, model, serialNo, issue } = req.body;
+ const { customerId, amount, notes, status, serviceItems } = req.body;
     if (!customerId || !amount) return res.status(400).json({ message: "Customer and Amount required" });
 
     const customer = await Customer.findById(customerId);
