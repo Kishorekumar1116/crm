@@ -63,8 +63,8 @@ function QuotationList() {
   const filteredQuotations = quotations.filter((quo) => {
     const name = quo.customerId?.name?.toLowerCase() || quo.name?.toLowerCase() || "";
     const phone = quo.customerId?.phone || quo.phone || "";
-    const product = quo.productName?.toLowerCase() || "";
-    const model = quo.model?.toLowerCase() || "";
+    const product = quo.serviceItems?.[0]?.productName?.toLowerCase() || "";
+const model = quo.serviceItems?.[0]?.model?.toLowerCase() || "";
     return (
       name.includes(searchTerm.toLowerCase()) ||
       phone.includes(searchTerm.toLowerCase()) ||
@@ -151,8 +151,8 @@ function QuotationList() {
                     <td className="fw-bold">{quo.customerId?.name || quo.name || "N/A"}</td>
                     <td>{quo.customerId?.phone || quo.phone || "N/A"}</td>
                     <td className="text-warning fw-bold">₹{quo.amount}</td>
-                    <td>{quo.productName || "-"}</td>
-                    <td>{quo.model || "-"}</td>
+                    <td>{quo.serviceItems?.[0]?.productName || "-"}</td>
+                    <td>{quo.serviceItems?.[0]?.model || "-"}</td>
                     <td>{quo.notes || "-"}</td>
                     <td className="text-center">
                       <button onClick={() => viewPdf(quo._id)} className="btn btn-sm btn-warning mx-1">View PDF</button>
