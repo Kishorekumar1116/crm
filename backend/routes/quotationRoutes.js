@@ -175,10 +175,10 @@ router.get("/view-pdf/:id", async (req, res) => {
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="Quotation-${quotation._id}.pdf"`
-    );
+res.setHeader(
+  "Content-Disposition",
+  `inline; filename="Quotation-${quotation._id}.pdf"`
+);
 
     doc.pipe(res);
     generatePDFContent(doc, quotation, flattened);
