@@ -79,21 +79,19 @@ const generatePDFContent = (doc, quotation, flattened) => {
       doc.moveDown(1);
     });
   } else {
-    // fallback to single productName/amount
-    const price = Number(quotation.amount || 0);
-    const qty = 1;
-    const total = price * qty;
-    const description = `${quotation.productName || ""} - ${quotation.issue || ""}\nModel: ${quotation.model || ""} | Serial: ${quotation.serialNo || ""}`;
-    const rowTop = doc.y;
-    doc.text(description, itemX, rowTop, { width: 260 });
-    const descriptionHeight = doc.heightOfString(description, { width: 260 });
-    doc.text(price.toFixed(2), priceX, rowTop, { width: 60, align: "right" });
-    doc.text(qty, qtyX, rowTop, { width: 40, align: "right" });
-    doc.text(total.toFixed(2), amountX, rowTop, { width: 80, align: "right" });
-    doc.y = rowTop + descriptionHeight + 10;
-    doc.moveTo(itemX, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(1);
-  }
+ const price = Number(quotation.amount || 0);
+ const qty = 1;
+ const total = price;
+
+ const description = "Service Charge";
+
+ const rowTop = doc.y;
+
+ doc.text(description, itemX, rowTop, { width: 260 });
+ doc.text(price.toFixed(2), priceX, rowTop, { width: 60, align: "right" });
+ doc.text(qty, qtyX, rowTop, { width: 40, align: "right" });
+ doc.text(total.toFixed(2), amountX, rowTop, { width: 80, align: "right" });
+}
 
   // TOTAL AMOUNT
   doc.font("Helvetica-Bold");
